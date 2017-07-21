@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from django.utils.translation import ugettext_lazy as _
 
-from .behaviors import Titled
+from .behaviors import Labelled
 
 
-class Table(Titled):
+class Table(Labelled):
     """Collection of Columns."""
 
     class Meta:

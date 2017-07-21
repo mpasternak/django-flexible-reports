@@ -1,21 +1,50 @@
 # -*- encoding: utf-8 -*-
+from django import forms
 from django.contrib import admin
+from django.utils.translation import ugettext_lazy as _
 
+from .helpers import SmallerTextarea
+from .helpers import SortableHiddenMixin
 from ..models import Report
 from ..models.report import ReportElement
 
-from .helpers import SortableHiddenMixin
+
+class ReportElementForm(forms.ModelForm):
+    class Meta:
+        widgets = {
+            'title': SmallerTextarea,
+            'subtitle': SmallerTextarea
+        }
 
 
-class ReportElementInline(
-    SortableHiddenMixin,
-    admin.TabularInline):
+class ReportElementInline(SortableHiddenMixin,
+                          admin.StackedInline):
     model = ReportElement
-    fields = ['datasource', 'table', 'position']
+
+    form = ReportElementForm
+
+    fields = ['title',
+              'subtitle',
+              'datasource',
+              'table',
+              'position']
+
+
+class ReportForm(forms.ModelForm):
+    class Meta:
+        widgets = {
+            'title': SmallerTextarea,
+            'subtitle': SmallerTextarea
+        }
 
 
 @admin.register(Report)
 class ReportAdmin(admin.ModelAdmin):
-    list_display = ['title', 'subtitle']
+    list_display = ['title', 'subtitle', 'slug', 'elements']
     inlines = [ReportElementInline, ]
-    pass
+    form = ReportForm
+    prepopulated_fields = {"slug": ("title",)}
+
+    def elements(self, obj):
+        return ", ".join([x.title for x in obj.reportelement_set.all()])
+    elements.short_description = _("Report's elements")

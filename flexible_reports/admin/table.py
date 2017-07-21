@@ -1,16 +1,36 @@
 # -*- encoding: utf-8 -*-
+from django import forms
 from django.contrib import admin
 
+from .helpers import SmallerTextarea, AverageTextarea, SortableHiddenMixin
 from ..models import Table, Column
 
 
-class ColumnInline(admin.StackedInline):
+class ColumnForm(forms.ModelForm):
+    class Meta:
+        widgets = {
+            'label': SmallerTextarea,
+            'template': AverageTextarea
+        }
+
+
+class ColumnInline(SortableHiddenMixin, admin.StackedInline):
     model = Column
-    fields = ["label", "sortable", "template"]
+    form = ColumnForm
+    fields = ['label', 'template', 'sortable', 'position']
+
+
+class TableForm(forms.ModelForm):
+    class Meta:
+        widgets = {
+            'label': SmallerTextarea
+        }
+
+    pass
 
 
 @admin.register(Table)
 class TableAdmin(admin.ModelAdmin):
-    list_display = ['title', 'subtitle']
+    list_display = ['label']
     inlines = [ColumnInline]
-    pass
+    form = TableForm

@@ -4,18 +4,18 @@ from django.db import models
 
 
 class Labelled(models.Model):
-    label = models.CharField(
-        max_length=250
-    )
+    label = models.TextField()
 
     def __str__(self):
         return self.label
 
+    class Meta:
+        abstract = True
+
 
 class Titled(models.Model):
-    title = models.TextField(
-        null=True,
-        blank=True)
+    title = models.TextField()
+
     subtitle = models.TextField(
         null=True,
         blank=True)

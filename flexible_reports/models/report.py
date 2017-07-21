@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from .behaviors import Orderable, Titled
 
 
-class ReportElement(Orderable):
+class ReportElement(Titled, Orderable):
     parent = models.ForeignKey('flexible_reports.Report')
     datasource = models.ForeignKey('flexible_reports.Datasource')
     table = models.ForeignKey('flexible_reports.Table')
@@ -17,6 +17,8 @@ class ReportElement(Orderable):
 class Report(Titled):
     """Report is a collection of multiple Datasources' data
     rendered in Tables. """
+
+    slug = models.SlugField()
 
     class Meta:
         verbose_name_plural = _("Reports")
