@@ -31,7 +31,7 @@ lint: ## check style with flake8
 	flake8 flexible_reports tests
 
 test: ## run tests quickly with the default Python
-	python runtests.py tests
+	pytest tests
 
 test-all: ## run tests on every Python version with tox
 	tox
@@ -57,3 +57,11 @@ release: clean ## package and upload a release
 sdist: clean ## package
 	python setup.py sdist
 	ls -l dist
+
+rebuild:
+	rm -rf flexible_reports/migrations
+	python example/manage.py makemigrations flexible_reports
+	rm example/db.sqlite3
+	python example/manage.py migrate
+	echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin', 'admin')" | python example/manage.py shell
+	python example/manage.py runserver 127.0.0.1:8888

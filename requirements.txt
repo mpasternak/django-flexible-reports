@@ -1,2 +1,2 @@
-django-model-utils>=2.0
-# Additional requirements go here
+django-dsl==0.1.3
+Django>=1.10,<1.11
