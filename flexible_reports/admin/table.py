@@ -15,6 +15,7 @@ class ColumnForm(forms.ModelForm):
 
 
 class ColumnInline(SortableHiddenMixin, admin.StackedInline):
+    extra = 0
     model = Column
     form = ColumnForm
     fields = ['label', 'template', 'sortable', 'position']
