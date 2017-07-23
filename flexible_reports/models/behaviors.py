@@ -1,6 +1,16 @@
 # -*- encoding: utf-8 -*-
-
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
+
+class WithBaseModel(models.Model):
+    base_model = models.ForeignKey(
+        ContentType,
+        verbose_name=_("Base model"),
+    )
+
+    class Meta:
+        abstract = True
 
 
 class Labelled(models.Model):
@@ -34,3 +44,4 @@ class Orderable(models.Model):
 
     class Meta:
         abstract = True
+        ordering = ('position',)
