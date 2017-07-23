@@ -19,15 +19,20 @@ class ReportElementForm(forms.ModelForm):
 
 class ReportElementInline(SortableHiddenMixin,
                           admin.StackedInline):
+    extra = 0
+
     model = ReportElement
 
     form = ReportElementForm
 
     fields = ['title',
+              'slug',
               'subtitle',
               'datasource',
               'table',
               'position']
+
+    prepopulated_fields = {'slug': ['title', 'subtitle']}
 
 
 class ReportForm(forms.ModelForm):
