@@ -23,9 +23,16 @@ class Datasource(Labelled, WithBaseModel):
     dsl_query = DjangoDSLField(
         verbose_name=_("DSL query"))
 
+    distinct = models.BooleanField(
+        default=True,
+        verbose_name=_("Distinct"),
+        help_text=_("Output only distinct records")
+    )
+
     class Meta:
         verbose_name = _("Datasource")
         verbose_name_plural = _("Datasources")
+        ordering = ('label',)
 
     def get_model(self):
         return self.base_model.model_class()
