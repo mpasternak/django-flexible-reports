@@ -1,3 +1,3 @@
-django-dsl==0.1.6
+django-dsl==0.1.7
 django-tables2==1.10.0
 Django>=1.10,<1.11
