@@ -24,6 +24,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.admin",
     "flexible_reports",
+    "django_tables2",
+    'test_app'
 ]
 
 SITE_ID = 1
