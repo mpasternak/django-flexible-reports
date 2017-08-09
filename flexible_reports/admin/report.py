@@ -3,6 +3,7 @@ from django import forms
 from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 
+from flexible_reports.admin.helpers import BiggerTextarea
 from .helpers import SmallerTextarea
 from .helpers import SortableHiddenMixin
 from ..models import Report
@@ -39,7 +40,8 @@ class ReportForm(forms.ModelForm):
     class Meta:
         widgets = {
             'title': SmallerTextarea,
-            'subtitle': SmallerTextarea
+            'subtitle': SmallerTextarea,
+            'template': BiggerTextarea
         }
 
 
