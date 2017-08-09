@@ -102,3 +102,4 @@ ENV/
 
 .idea
 example/db.sqlite
+example/db.sqlite3
