@@ -56,7 +56,7 @@ setup(
         'flexible_reports',
     ],
     include_package_data=True,
-    install_requires=["django-dsl", "django"],
+    install_requires=[x.strip() for x in open("requirements.txt").readlines() if x.strip()],
     license="MIT",
     zip_safe=False,
     keywords='django-flexible-reports',
