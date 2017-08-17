@@ -1,6 +1,5 @@
 # -*- encoding: utf-8 -*-
 from django.core.exceptions import ValidationError
-from django.core.validators import RegexValidator
 from django.template import Template
 from django.utils.translation import ugettext_lazy as _
 
@@ -15,4 +14,3 @@ def TemplateValidator(value):
             _("Cannot compile template (%(exception)s)"),
             params={"exception": e}
         )
-

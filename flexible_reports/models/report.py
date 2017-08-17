@@ -44,6 +44,7 @@ class Report(Titled):
     )
 
     _base_queryset = None
+
     @property
     def base_queryset(self):
         if self._base_queryset is None:

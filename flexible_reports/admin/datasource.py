@@ -8,7 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 from django_dsl import compiler, exceptions
 
 from flexible_reports.admin.helpers import BiggerTextarea
-from .helpers import SmallerTextarea, AverageTextarea
+from .helpers import SmallerTextarea
 from .. import utils
 from ..models.datasource import Datasource
 
@@ -57,4 +57,5 @@ class DatasourceAdmin(admin.ModelAdmin):
 
     def dsl_query_fmt(self, obj):
         return mark_safe(f"<pre>{ obj.dsl_query }</pre>")
+
     dsl_query_fmt.short_description = _("DSL query")
