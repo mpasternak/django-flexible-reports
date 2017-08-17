@@ -15,7 +15,7 @@ class SortWithOtherTables:
     id = 0
     label = _("sort with other tables")
     help_text = _("""if a column in this table is sorted, all the other tables
-    on the page with columns with identical name will be sorted too, as long 
+    on the page with columns with identical name will be sorted too, as long
     as they also are marked as 'sort with other tables'
     """)
 
@@ -28,8 +28,8 @@ class SortIndividually:
 
     id = 1
     label = _("sort individually")
-    help_text = _("""this table will be sorted individually; even if other 
-    tables on the page have columns with same label this table will be 
+    help_text = _("""this table will be sorted individually; even if other
+    tables on the page have columns with same label this table will be
     sorted independently""")
 
     def get_prefix(self, table):
@@ -40,7 +40,7 @@ class SortInGroup:
     """prefix = self.group_prefix"""
     id = 2
     label = _("sort in group")
-    help_text = _("""this table will be sorted together with a group of 
+    help_text = _("""this table will be sorted together with a group of
     tables; you must enter a prefix for this group""")
 
     def get_prefix(self, table):
@@ -74,7 +74,7 @@ class Table(Labelled):
         null=True,
         blank=True,
         max_length=200,
-        help_text=_("""this value is used as a prefix only when "Sort 
+        help_text=_("""this value is used as a prefix only when "Sort
         option" is set to "sort in group"
         """))
 
@@ -83,7 +83,7 @@ class Table(Labelled):
         null=True,
         blank=True,
         help_text=_("""
-        Template which will be displayed when there is no data for this 
+        Template which will be displayed when there is no data for this
         table.
         """),
         default=_("There is no data for this table.")

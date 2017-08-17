@@ -56,7 +56,9 @@ setup(
         'flexible_reports',
     ],
     include_package_data=True,
-    install_requires=[x.strip() for x in open("requirements.txt").readlines() if x.strip()],
+    install_requires=[x.strip() for x in open(
+            os.path.join(os.path.dirname(__file__), 
+                         "requirements.txt")).readlines() if x.strip()],
     license="MIT",
     zip_safe=False,
     keywords='django-flexible-reports',
