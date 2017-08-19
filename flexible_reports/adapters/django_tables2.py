@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 import copy
 import itertools
+import sys
 from collections import OrderedDict
 
 from django.template.base import Template, Context
@@ -79,7 +80,11 @@ def table(table, request, object_list):
     for c in table.column_set.all():
         extra_columns.append(column(c))
 
-    return Table(
+    class AdHocTable(Table):
+        class Meta:
+            per_page = sys.maxsize
+
+    return AdHocTable(
         data=object_list,
         prefix=table.get_prefix(),
         extra_columns=extra_columns,
