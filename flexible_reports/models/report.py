@@ -44,6 +44,7 @@ class Report(Titled):
     )
 
     _base_queryset = None
+    _context = None
 
     @property
     def base_queryset(self):
@@ -52,9 +53,16 @@ class Report(Titled):
                                        "report using Report.set_base_queryset")
         return self._base_queryset
 
+    @property
+    def context(self):
+        return self._context
+
     class Meta:
         verbose_name_plural = _("Reports")
         verbose_name = _("Report")
 
     def set_base_queryset(self, queryset):
         self._base_queryset = queryset
+
+    def set_context(self, context):
+        self._context = context

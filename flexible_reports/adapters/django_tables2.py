@@ -102,7 +102,7 @@ def report(report, parent_context):
     for elem in report.reportelement_set.all().select_related():
         datasource = elem.datasource
         object_list = report.base_queryset.filter(
-            datasource.get_filter()
+            datasource.get_filter(context=report.context)
         )
 
         if datasource.distinct:

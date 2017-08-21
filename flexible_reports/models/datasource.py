@@ -37,7 +37,8 @@ class Datasource(Labelled, WithBaseModel):
     def get_shortcuts(self):
         return getattr(self.get_model(), 'django_dsl_shortcuts', {})
 
-    def get_filter(self):
+    def get_filter(self, context=None):
         return compiler.compile(
             self.dsl_query,
-            shortcuts=self.get_shortcuts())
+            shortcuts=self.get_shortcuts(),
+            context=context)
