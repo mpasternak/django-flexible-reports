@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.contrib.postgres.fields.jsonb import JSONField
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -9,7 +10,9 @@ from .behaviors import Orderable, Labelled
 class Column(Labelled, Orderable):
     parent = models.ForeignKey('flexible_reports.Table')
 
-    sortable = models.BooleanField(default=True)
+    sortable = models.BooleanField(
+        verbose_name=_("Sortable"),
+        default=True)
 
     attr_name = models.CharField(
         verbose_name=_("Attribute name"),
@@ -46,11 +49,31 @@ class Column(Labelled, Orderable):
         - *default* -- appropriate default value to use as fallback
         """))
 
+    attrs = JSONField(
+        verbose_name=_("HTML attributes"),
+        blank=True,
+        null=True
+    )
+
     display_totals = models.BooleanField(
         default=False,
         verbose_name=_("Display totals"),
         help_text=_("Display column totals in footer. For columns without "
                     "Attribute name, this will be total number of the rows.")
+    )
+
+    strip_html_on_export = models.BooleanField(
+        default=True,
+        verbose_name=_("Strip HTML on export"),
+        help_text=_("""Strip HTML tags when exporting to other, non-browser 
+        formats, like MS Word or MS Excel. """)
+    )
+
+    exclude_from_export = models.BooleanField(
+        default=False,
+        verbose_name=_("Exclude from export"),
+        help_text=_("Exclude this column when exporting to other, non-browser"
+                    "formats, like MS Word or MS Excel")
     )
 
     footer_template = models.TextField(
@@ -59,7 +82,7 @@ class Column(Labelled, Orderable):
         blank=True,
         null=True,
         help_text=_("""
-        Template for footer.""")
+        Template for footer. Used only if "Display totals" is enabled. """)
     )
 
     class Meta:
