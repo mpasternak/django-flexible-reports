@@ -9,8 +9,12 @@ SECRET_KEY = "99999999999999999999999999999999999999999999999999"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": ":memory:",
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": "flexible_reports",
+        "USER": "postgres",
+        "PASSWORD": None,
+        "HOST": "localhost",
+        "PORT": 5432
     }
 }
 
