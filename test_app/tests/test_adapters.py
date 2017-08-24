@@ -18,8 +18,7 @@ def test_report(rf):
     mommy.make(MyTestFoo, i=5)
 
     r = mommy.make(Report,
-                   title="Report title",
-                   subtitle="Report subtitle")
+                   title="Report title")
 
     t = mommy.make(Table,
                    label="tmp",
@@ -29,6 +28,7 @@ def test_report(rf):
                    label="Value of i",
                    parent=t,
                    attr_name="i",
+                   position=0,
                    display_totals=True)
 
     c = mommy.make(Column,
@@ -36,6 +36,7 @@ def test_report(rf):
                    parent=t,
                    attr_name="i",
                    template="",
+                   position=1,
                    display_totals=False)
 
     ds = mommy.make(Datasource,
@@ -44,7 +45,6 @@ def test_report(rf):
 
     re = mommy.make(ReportElement,
                     title="Report element title",
-                    subtitle="Report element subtitle",
                     slug="report-element-title",
                     table=t,
                     parent=r,
@@ -54,12 +54,16 @@ def test_report(rf):
     r.set_base_queryset(MyTestFoo.objects.all())
 
     request = rf.get('/')
-    res = django_tables2.report(
-        r, RequestContext(request, dict(request=request))
-    )
-
+    args = r, RequestContext(request, dict(request=request))
+    res = django_tables2.as_html(*args)
+    
     assert res != None
 
     bs = BeautifulSoup(res, "lxml")
     assert len(bs.table.tbody.find_all("td")) == 4
     assert bs.table.tfoot.td.text == "10"
+
+    # Run extra export procs
+    django_tables2.as_xlsx_databook(*args)
+    django_tables2.as_docx_response(*args)
+    django_tables2.as_xlsx_response(*args)
