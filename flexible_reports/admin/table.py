@@ -14,7 +14,8 @@ class ColumnForm(forms.ModelForm):
         widgets = {
             'label': SmallerTextarea,
             'template': AverageTextarea,
-            'footer_template': SmallerTextarea
+            'footer_template': SmallerTextarea,
+            'attrs': SmallerTextarea
         }
 
 
@@ -25,7 +26,10 @@ class ColumnInline(SortableHiddenMixin, admin.StackedInline):
     fields = ['label',
               'attr_name',
               'template',
+              'attrs',
               'sortable',
+              'exclude_from_export',
+              'strip_html_on_export',
               'display_totals',
               'footer_template',
               'position']
@@ -33,11 +37,16 @@ class ColumnInline(SortableHiddenMixin, admin.StackedInline):
 
 class TableForm(forms.ModelForm):
     class Meta:
-        fields = ['label', 'base_model', 'sort_option', 'group_prefix',
+        fields = ['label',
+                  'base_model',
+                  'sort_option',
+                  'group_prefix',
+                  'attrs',
                   'empty_template']
         widgets = {
             'label': SmallerTextarea,
-            'empty_template': SmallerTextarea
+            'empty_template': SmallerTextarea,
+            'attrs': SmallerTextarea
         }
 
     pass
