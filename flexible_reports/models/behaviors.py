@@ -32,11 +32,6 @@ class Titled(models.Model):
         verbose_name=_("Title")
     )
 
-    subtitle = models.TextField(
-        verbose_name=_("Subtitle"),
-        null=True,
-        blank=True)
-
     def __str__(self):
         return self.title
 
