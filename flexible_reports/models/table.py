@@ -3,6 +3,7 @@
 from collections import OrderedDict
 
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.fields.jsonb import JSONField
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _, string_concat
@@ -67,6 +68,12 @@ class Table(Labelled):
             (x.id, string_concat(x.label, " - ", x.help_text))
             for x in AllSortOptions.values()
         ],
+    )
+
+    attrs = JSONField(
+        verbose_name=_("HTML attributes"),
+        blank=True,
+        null=True
     )
 
     group_prefix = models.CharField(
