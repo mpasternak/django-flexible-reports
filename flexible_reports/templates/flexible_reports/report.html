@@ -7,11 +7,9 @@ Example template
 {% load render_table from django_tables2 %}
 
 <h1>{{ self.title }}</h1>
-<h2>{{ self.subtitle }}</h2>
 
 {% for element in elements.values %}
     <h3>{{ element.title }}</h3>
-    <h4>{{ element.subtitle }}</h4>
 
     {% render_table element.table %}
 {% empty %}
