@@ -14,7 +14,6 @@ class ReportElementForm(forms.ModelForm):
     class Meta:
         widgets = {
             'title': SmallerTextarea,
-            'subtitle': SmallerTextarea
         }
 
 
@@ -28,26 +27,24 @@ class ReportElementInline(SortableHiddenMixin,
 
     fields = ['title',
               'slug',
-              'subtitle',
               'datasource',
               'table',
               'position']
 
-    prepopulated_fields = {'slug': ['title', 'subtitle']}
+    prepopulated_fields = {'slug': ['title',]}
 
 
 class ReportForm(forms.ModelForm):
     class Meta:
         widgets = {
             'title': SmallerTextarea,
-            'subtitle': SmallerTextarea,
             'template': BiggerTextarea
         }
 
 
 @admin.register(Report)
 class ReportAdmin(admin.ModelAdmin):
-    list_display = ['title', 'subtitle', 'slug', 'elements']
+    list_display = ['title', 'slug', 'elements']
     inlines = [ReportElementInline, ]
     form = ReportForm
     prepopulated_fields = {"slug": ("title",)}
