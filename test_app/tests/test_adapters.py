@@ -1,9 +1,8 @@
 # -*- encoding: utf-8 -*-
 import pytest
-from bs4 import BeautifulSoup, BeautifulStoneSoup
+from bs4 import BeautifulSoup
 from django.contrib.contenttypes.models import ContentType
 from django.template.context import RequestContext
-from django.test.client import RequestFactory
 from model_mommy import mommy
 
 from flexible_reports.adapters import django_tables2
@@ -56,7 +55,7 @@ def test_report(rf):
     request = rf.get('/')
     args = r, RequestContext(request, dict(request=request))
     res = django_tables2.as_html(*args)
-    
+
     assert res != None
 
     bs = BeautifulSoup(res, "lxml")
@@ -65,5 +64,6 @@ def test_report(rf):
 
     # Run extra export procs
     django_tables2.as_xlsx_databook(*args)
-    django_tables2.as_docx_response(*args)
-    django_tables2.as_xlsx_response(*args)
+    res = django_tables2.as_docx(*args)
+    res.seek(0)
+    assert len(res.read()) != 0

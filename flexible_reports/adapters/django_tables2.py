@@ -3,9 +3,10 @@ import copy
 import itertools
 import sys
 from collections import OrderedDict
+from tempfile import NamedTemporaryFile
 
 import lxml.html
-from django.http.response import HttpResponse
+import pypandoc
 from django.template.base import Template, Context
 from django.utils.safestring import mark_safe
 from django_tables2.columns.templatecolumn import TemplateColumn, Column
@@ -22,27 +23,26 @@ class CounterMixin:
         return str(self._counter.__next__())
 
 
-def render_footer(bound_column, table):
-    try:
-        value = sum([getattr(x, bound_column.column.accessor)
-                     for x in table.data])
-    except Exception as e:
-        value = str(e)
-
-    context = Context({'value': value})
-
-    return Template(
-        bound_column.column.footer_template
-    ).render(context=context)
-
-
 class FooterMixin:
     def __init__(self, display_totals, footer_template, kwargs):
         self.display_totals = display_totals
         self.footer_template = footer_template
 
-        if display_totals:
-            kwargs['footer'] = render_footer
+        if self.display_totals:
+            self.render_footer = self._render_footer
+
+    def _render_footer(self, table):
+        try:
+            value = sum([getattr(x, self.accessor)
+                         for x in table.data])
+        except Exception as e:
+            value = str(e)
+
+        context = Context({'value': value})
+
+        return Template(
+            self.footer_template
+        ).render(context=context)
 
 
 class StripHTMLOnExportMixin:
@@ -151,6 +151,13 @@ def as_html(report, parent_context):
     return Template(report.template).render(render_context)
 
 
+def as_docx(report, parent_context):
+    data = as_html(report, parent_context)
+    f = NamedTemporaryFile(delete=False)
+    pypandoc.convert_text(data, 'docx', format='html', outputfile=f.name)
+    return f
+
+
 def as_xlsx_databook(report, parent_context):
     render_context = _report(report, parent_context)
 
@@ -165,39 +172,3 @@ def as_xlsx_databook(report, parent_context):
         databook.add_sheet(dataset)
 
     return databook
-
-
-def as_docx_response(report, parent_context, filename=None):
-    data = as_html(report, parent_context)
-
-    response = HttpResponse(
-        """<head>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
-        </head><body>""" + data + "</body>",
-        content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    )
-
-    if filename is None:
-        filename = report.title + ".docx"
-
-    response['Content-Disposition'] = 'attachment; filename="{}"'.format(
-        filename
-    )
-    response['Content-Length'] = len(data)
-    return response
-
-
-def as_xlsx_response(report, parent_context, filename=None):
-    response = HttpResponse(content_type=TableExport.FORMATS[TableExport.XLSX])
-    if filename is None:
-        filename = report.title + ".xlsx"
-
-    response['Content-Disposition'] = 'attachment; filename="{}"'.format(
-        filename
-    )
-
-    xlsx = as_xlsx_databook(report, parent_context)
-    data = xlsx.export(TableExport.XLSX)
-    response['Content-Length'] = len(data)
-    response.write(data)
-    return response
