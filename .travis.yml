@@ -5,13 +5,16 @@ services:
 
 addons:
   postgresql: "9.6"
-  
+  apt:
+    packages:
+      - pandoc
+
 language: python
 
 python:
   - "3.6"
 
-env: 
+env:
   - TOX_ENV=py36-django-110
 
 matrix:
