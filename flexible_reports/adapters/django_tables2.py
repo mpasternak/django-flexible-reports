@@ -12,7 +12,7 @@ from django.utils.safestring import mark_safe
 from django_tables2.columns.templatecolumn import TemplateColumn, Column
 from django_tables2.export.export import TableExport
 from django_tables2.tables import Table
-from tablib.core import Databook
+from tablib.core import Databook, Dataset
 
 
 class CounterMixin:
@@ -158,7 +158,7 @@ def as_docx(report, parent_context):
     return f
 
 
-def as_xlsx_databook(report, parent_context):
+def as_tablib_databook(report, parent_context):
     render_context = _report(report, parent_context)
 
     databook = Databook()
@@ -168,7 +168,19 @@ def as_xlsx_databook(report, parent_context):
             element['table']
         ).dataset
 
-        dataset.title = element['title']
+        dataset.title = element['title'][:31]
         databook.add_sheet(dataset)
 
     return databook
+
+def as_tablib_dataset(report, parent_context):
+    render_context = _report(report, parent_context)
+
+    dataset = Dataset()
+    for element in render_context['elements'].values():
+        table = element['table']
+        dataset.append_separator(element['title'])
+        for i, row in enumerate(table.as_values()):
+            dataset.append(row)
+
+    return dataset
