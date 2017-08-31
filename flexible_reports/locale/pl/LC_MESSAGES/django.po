@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-08-24 02:35+0200\n"
-"PO-Revision-Date: 2017-08-24 02:39+0200\n"
+"POT-Creation-Date: 2017-08-31 02:28+0200\n"
+"PO-Revision-Date: 2017-08-31 02:29+0200\n"
 "Last-Translator: Michał Pasternak <michal.dtz@gmail.com>\n"
 "Language-Team: \n"
 "Language: pl\n"
@@ -36,19 +36,19 @@ msgstr "Zapytanie w języku DSL"
 msgid "Report's elements"
 msgstr "Składowe raportu"
 
-#: flexible_reports/admin/table.py:67 flexible_reports/models/column.py:92
+#: flexible_reports/admin/table.py:93 flexible_reports/models/column.py:92
 msgid "Columns"
 msgstr "Kolumny"
 
-#: flexible_reports/admin/table.py:73
+#: flexible_reports/admin/table.py:99
 msgid " (group name: "
 msgstr " (nazwa grupy: "
 
-#: flexible_reports/admin/table.py:79 flexible_reports/models/table.py:66
+#: flexible_reports/admin/table.py:105 flexible_reports/models/table.py:87
 msgid "Sort option"
 msgstr "Jak sortować"
 
-#: flexible_reports/models/behaviors.py:10 flexible_reports/models/table.py:62
+#: flexible_reports/models/behaviors.py:10 flexible_reports/models/table.py:83
 msgid "Base model"
 msgstr "Podstawowy model"
 
@@ -131,7 +131,7 @@ msgstr ""
 "- *default* - domyślna wartość dla tej kolumny\n"
 " "
 
-#: flexible_reports/models/column.py:53 flexible_reports/models/table.py:74
+#: flexible_reports/models/column.py:53 flexible_reports/models/table.py:95
 msgid "HTML attributes"
 msgstr "Atrybuty HTML"
 
@@ -182,9 +182,9 @@ msgid ""
 msgstr ""
 "\n"
 "Templatka dla stopki. Używane jedynie, jeżeli zaznaczono „Wyświetlaj "
-"podsumowanie”."
+"podsumowanie”. "
 
-#: flexible_reports/models/column.py:91
+#: flexible_reports/models/column.py:91 flexible_reports/models/table.py:61
 msgid "Column"
 msgstr "Kolumna"
 
@@ -256,7 +256,7 @@ msgid ""
 msgstr ""
 "jeżeli kolumna w tej tabeli zostanie użyta do posortowania, to wszystkie "
 "inne tabele na tej stronie z kolumnami identycznie nazwanymi również będą "
-"posortowane, o ile są one oznaczone jako „sortuj wraz z innymi tabelami”"
+"posortowane, o ile są one oznaczone jako „sortuj wraz z innymi tabelami” "
 
 #: flexible_reports/models/table.py:31
 msgid "sort individually"
@@ -284,24 +284,41 @@ msgstr ""
 "ta tabela będzie sortowana razem z innymi w grupie tabel; musisz wprowadzić "
 "nazwę grupy"
 
-#: flexible_reports/models/table.py:80
+#: flexible_reports/models/table.py:59 flexible_reports/models/table.py:121
+msgid "Table"
+msgstr "Tabela"
+
+#: flexible_reports/models/table.py:63
+msgid "Descending"
+msgstr "Malejąco"
+
+#: flexible_reports/models/table.py:68
+msgid "Column order information"
+msgstr "Informacja o sortowaniu kolumn"
+
+#: flexible_reports/models/table.py:69
+msgid "Column order informations"
+msgstr "Informacje o sortowaniu kolumn"
+
+#: flexible_reports/models/table.py:101
 msgid "Group prefix"
 msgstr "Nazwa grupy"
 
-#: flexible_reports/models/table.py:84
+#: flexible_reports/models/table.py:105
 msgid ""
 "this value is used as a prefix only when \"Sort\n"
 "        option\" is set to \"sort in group\"\n"
 "        "
 msgstr ""
 "ta wartość jest używana jako nazwa grupy jedynie w sytuacji, gdy sortowanie "
-"jest ustalone na „sortuj w grupie\""
+"jest ustalone na „sortuj w grupie”\n"
+" "
 
-#: flexible_reports/models/table.py:89
+#: flexible_reports/models/table.py:110
 msgid "Empty template"
 msgstr "Pusta templatka"
 
-#: flexible_reports/models/table.py:92
+#: flexible_reports/models/table.py:113
 msgid ""
 "\n"
 "        Template which will be displayed when there is no data for this\n"
@@ -311,19 +328,15 @@ msgstr ""
 "\n"
 "Templatka, która zostanie wyświetlona gdy nie ma danych dla tej tabeli. "
 
-#: flexible_reports/models/table.py:96
+#: flexible_reports/models/table.py:117
 msgid "There is no data for this table."
-msgstr "Nie znaleziono takich rekordów"
+msgstr "Nie znaleziono takich rekordów."
 
-#: flexible_reports/models/table.py:100
-msgid "Table"
-msgstr "Tabela"
-
-#: flexible_reports/models/table.py:101
+#: flexible_reports/models/table.py:122
 msgid "Tables"
 msgstr "Tabele"
 
-#: flexible_reports/models/table.py:108
+#: flexible_reports/models/table.py:129
 msgid "Please enter group prefix if you want to sort in group"
 msgstr "Proszę wpisać prefiks grupy, jeżeli chcesz sortować tą tabelę w grupie"
 
