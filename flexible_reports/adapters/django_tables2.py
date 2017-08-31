@@ -5,6 +5,7 @@ import sys
 from collections import OrderedDict
 from tempfile import NamedTemporaryFile
 
+import bleach
 import lxml.html
 import pypandoc
 from django.template.base import Template, Context
@@ -13,7 +14,7 @@ from django_tables2.columns.templatecolumn import TemplateColumn, Column
 from django_tables2.export.export import TableExport
 from django_tables2.tables import Table
 from tablib.core import Databook, Dataset
-import bleach
+
 
 class CounterMixin:
     def __init__(self):

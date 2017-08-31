@@ -64,7 +64,7 @@ def test_report(rf):
 
     # Run extra export procs
     django_tables2.as_tablib_databook(*args)
-    django_tables2.as_tablib_dataset(*args)    
+    django_tables2.as_tablib_dataset(*args)
     res = django_tables2.as_docx(*args)
     res.seek(0)
     assert len(res.read()) != 0
