@@ -67,7 +67,6 @@ class TableForm(forms.ModelForm):
                   'group_prefix',
                   'attrs',
                   'empty_template',
-                  'docx_stylesheet',
                   ]
         widgets = {
             'label': SmallerTextarea,
