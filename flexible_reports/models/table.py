@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _, string_concat
 
-from .behaviors import Labelled
+from .behaviors import Labelled, Orderable
 
 
 class SortWithOtherTables:
@@ -52,6 +52,27 @@ AllSortOptions = OrderedDict(
     [(x.id, x) for x in [SortWithOtherTables,
                          SortIndividually,
                          SortInGroup]])
+
+
+class ColumnOrder(Orderable):
+    table = models.ForeignKey("flexible_reports.Table",
+                              verbose_name=_("Table"))
+    column = models.ForeignKey("flexible_reports.Column",
+                               verbose_name=_("Column"))
+    desc = models.BooleanField(
+        _("Descending"),
+        default=False
+    )
+
+    class Meta:
+        verbose_name = _("Column order information")
+        verbose_name_plural = _("Column order informations")
+        ordering = ('position',)
+
+    def get(self):
+        if not self.desc:
+            return self.column.label
+        return f"-{ self.column.label }"
 
 
 class Table(Labelled):

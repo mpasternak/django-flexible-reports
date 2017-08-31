@@ -13,7 +13,7 @@ from django_tables2.columns.templatecolumn import TemplateColumn, Column
 from django_tables2.export.export import TableExport
 from django_tables2.tables import Table
 from tablib.core import Databook, Dataset
-
+import bleach
 
 class CounterMixin:
     def __init__(self):
@@ -107,7 +107,12 @@ def table(table, request, object_list):
         class Meta:
             per_page = sys.maxsize
 
+    order_by = []
+    for column_order in table.columnorder_set.all().order_by('position'):
+        order_by.append(column_order.get())
+
     return AdHocTable(
+        order_by=order_by,
         data=object_list,
         prefix=table.get_prefix(),
         extra_columns=extra_columns,
@@ -151,8 +156,15 @@ def as_html(report, parent_context):
     return Template(report.template).render(render_context)
 
 
-def as_docx(report, parent_context):
+def as_docx(report,
+            parent_context,
+            allowed_tags=['table', 'tr', 'td', 'th', 'b', 'i', 'u',
+                          'sup', 'sub', 'h1', 'h2', 'h3', 'h4',
+                          'em', 'strong', 'strike', 'font'],
+            allowed_attributes={"td": ["colspan"]}):
     data = as_html(report, parent_context)
+    # Remove "<a>" tags from headers
+    data = bleach.clean(data, allowed_tags, allowed_attributes, strip=True)
     f = NamedTemporaryFile(delete=False)
     pypandoc.convert_text(data, 'docx', format='html', outputfile=f.name)
     return f

@@ -6,7 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from flexible_reports.models.table import AllSortOptions, SortInGroup
 from .helpers import SmallerTextarea, AverageTextarea, SortableHiddenMixin
-from ..models import Table, Column
+from ..models import Table, Column, ColumnOrder
 
 
 class ColumnForm(forms.ModelForm):
@@ -17,6 +17,30 @@ class ColumnForm(forms.ModelForm):
             'footer_template': SmallerTextarea,
             'attrs': SmallerTextarea
         }
+
+
+class ColumnOrderForm(forms.ModelForm):
+    def __init__(self, parent, *args, **kw):
+        super(ColumnOrderForm, self).__init__(*args, **kw)
+        self.fields['column'].queryset = Column.objects.filter(parent=parent)
+
+
+class ColumnOrderInline(SortableHiddenMixin, admin.TabularInline):
+    extra = 0
+    model = ColumnOrder
+    fields = ['column', 'desc', 'position']
+
+    def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
+        field = super(ColumnOrderInline, self).formfield_for_foreignkey(db_field, request, **kwargs)
+        if db_field.name == 'column':
+            if request._parent_ is not None:
+                field.queryset = field.queryset.filter(
+                    parent=request._parent_,
+                    sortable=True)
+
+            else:
+                field.queryset = field.queryset.none()
+        return field
 
 
 class ColumnInline(SortableHiddenMixin, admin.StackedInline):
@@ -42,7 +66,9 @@ class TableForm(forms.ModelForm):
                   'sort_option',
                   'group_prefix',
                   'attrs',
-                  'empty_template']
+                  'empty_template',
+                  'docx_stylesheet',
+                  ]
         widgets = {
             'label': SmallerTextarea,
             'empty_template': SmallerTextarea,
@@ -58,7 +84,7 @@ class TableAdmin(admin.ModelAdmin):
                     'base_model',
                     'short_sort_option',
                     'columns']
-    inlines = [ColumnInline]
+    inlines = [ColumnInline, ColumnOrderInline]
     form = TableForm
 
     def columns(self, obj):
@@ -78,3 +104,7 @@ class TableAdmin(admin.ModelAdmin):
 
     short_sort_option.short_description = _("Sort option")
     short_sort_option.admin_order_field = "sort_option"
+
+    def get_form(self, request, obj=None, **kwargs):
+        request._parent_ = obj
+        return super(TableAdmin, self).get_form(request, obj, **kwargs)
