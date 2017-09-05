@@ -99,28 +99,39 @@ def column(column):
     return (column.label, klass)
 
 
+_table_cache = {}
+
+
+def _table(table):
+    global _table_cache
+
+    if table.pk not in _table_cache:
+        order_by = []
+        for column_order in table.columnorder_set.all() \
+            .select_related().order_by("position"):
+            order_by.append(column_order.get())
+        table.order_by = order_by
+
+        class AdHocTable(Table):
+            class Meta:
+                attrs = table.attrs or {}
+                order_by = table.order_by
+                per_page = sys.maxsize
+                prefix = table.get_prefix()
+                empty_text = mark_safe(table.empty_template)
+
+        extra_columns = []
+        for c in table.column_set.all():
+            label, klass = column(c)
+            AdHocTable.base_columns[label] = klass
+            # extra_columns.append(column(c))
+
+        _table_cache[table.pk] = AdHocTable
+
+    return _table_cache[table.pk]
+
 def table(table, request, object_list):
-    extra_columns = []
-    for c in table.column_set.all():
-        extra_columns.append(column(c))
-
-    class AdHocTable(Table):
-        class Meta:
-            per_page = sys.maxsize
-
-    order_by = []
-    for column_order in table.columnorder_set.all().order_by('position'):
-        order_by.append(column_order.get())
-
-    return AdHocTable(
-        order_by=order_by,
-        data=object_list,
-        prefix=table.get_prefix(),
-        extra_columns=extra_columns,
-        request=request,
-        attrs=table.attrs,
-        empty_text=mark_safe(table.empty_template))
-
+    return _table(table)(data=object_list, request=request)
 
 def _report(report, parent_context):
     render_context = copy.copy(parent_context)
@@ -144,7 +155,7 @@ def _report(report, parent_context):
             'table': table(
                 elem.table,
                 parent_context['request'],
-                object_list)
+                object_list.select_related())
         }
 
         render_context['elements'][elem.slug] = table_dict
