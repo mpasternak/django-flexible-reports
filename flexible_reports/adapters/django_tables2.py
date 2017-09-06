@@ -155,7 +155,7 @@ def _report(report, parent_context):
             'table': table(
                 elem.table,
                 parent_context['request'],
-                object_list.select_related())
+                object_list)
         }
 
         render_context['elements'][elem.slug] = table_dict
