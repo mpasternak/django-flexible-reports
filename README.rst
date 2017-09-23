@@ -8,9 +8,6 @@ Django Flexible Reports
 .. image:: https://travis-ci.org/mpasternak/django-flexible-reports.svg?branch=master
     :target: https://travis-ci.org/mpasternak/django-flexible-reports
 
-.. image:: https://codecov.io/gh/mpasternak/django-flexible-reports/branch/master/graph/badge.svg
-    :target: https://codecov.io/gh/mpasternak/django-flexible-reports
-
 .. image:: https://coveralls.io/repos/github/mpasternak/django-flexible-reports/badge.svg?branch=master
    :target: https://coveralls.io/github/mpasternak/django-flexible-reports?branch=master
 
