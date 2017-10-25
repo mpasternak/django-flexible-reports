@@ -68,3 +68,23 @@ def test_report(rf):
     res = django_tables2.as_docx(*args)
     res.seek(0)
     assert len(res.read()) != 0
+
+
+@pytest.mark.django_db
+def test_catchall_except_catchall():
+    mommy.make(MyTestFoo, i=1)
+    mommy.make(MyTestFoo, i=2)
+    mommy.make(MyTestFoo, i=3)
+
+    mtf = ContentType.objects.get_for_model(MyTestFoo)
+
+    r = mommy.make(Report)
+    t = mommy.make(Table, base_model=mtf)
+    c = mommy.make(Column, parent=t)
+    ds = mommy.make(Datasource, base_model=mtf, dsl_query="i < 3")
+    re = mommy.make(ReportElement, table=t, parent=r, datasource=ds)
+
+    r.set_base_queryset(MyTestFoo.objects.all())
+
+    res = django_tables2._report(r, {'request': None})
+    assert res['except_catchall']['test_app_mytestfoo'].count() == 1
