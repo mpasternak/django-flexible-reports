@@ -16,6 +16,7 @@ def test_templatetags_flexible(rf):
     x = "{% load flexible_reports_tags %}{% flexible report %}"
 
     r = mommy.make(Report)
+    r.set_base_queryset(MyTestFoo.objects.all())
 
     request = rf.get('/')
     ctx = RequestContext(request, dict(
@@ -25,12 +26,12 @@ def test_templatetags_flexible(rf):
     res = Template(x).render(context=ctx)
 
 
-
 @pytest.mark.django_db
 def test_templatetags_render(rf):
     x = "{% load flexible_reports_tags %}{% render report %}"
 
-    r = mommy.make(Report)
+    r = mommy.make(Report, template="foobar")
+    r.set_base_queryset(MyTestFoo.objects.all())
 
     request = rf.get('/')
     ctx = RequestContext(request, dict(
