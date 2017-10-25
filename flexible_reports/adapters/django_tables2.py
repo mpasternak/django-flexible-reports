@@ -14,6 +14,8 @@ from django.utils.safestring import mark_safe
 from django_tables2.columns.templatecolumn import TemplateColumn, Column
 from django_tables2.export.export import TableExport
 from django_tables2.tables import Table
+from flexible_reports.models.report import DATA_FROM_DATASOURCE, \
+    DATA_FROM_EXCEPT_CATCHALL, DATA_FROM_CATCHALL
 from tablib.core import Databook, Dataset
 
 
@@ -162,34 +164,63 @@ def _report(report, parent_context):
     })
 
     for elem in report.reportelement_set.all().select_related():
-        datasource = elem.datasource
-        filter = datasource.get_filter(context=report.context)
 
-        object_list = report.base_queryset.filter(filter)
+        if elem.data_from == DATA_FROM_DATASOURCE:
+            datasource = elem.datasource
+            filter = datasource.get_filter(context=report.context)
+            object_list = report.base_queryset.filter(filter)
 
-        render_context['catchall'][
-            "%s_%s" % (datasource.base_model.app_label,
-                       datasource.base_model.model)].append(filter)
+            render_context['catchall'][
+                "%s_%s" % (datasource.base_model.app_label,
+                           datasource.base_model.model)].append(filter)
 
-        if datasource.distinct:
-            object_list = object_list.distinct()
+            if datasource.distinct:
+                object_list = object_list.distinct()
 
-        table_dict = {
-            'title': elem.title,
-            'object_list': object_list,
-            'table': table(
-                elem.table,
-                parent_context['request'],
-                object_list)
-        }
+            table_dict = {
+                'title': elem.title,
+                'object_list': object_list,
+                'table': table(
+                    elem.table,
+                    parent_context['request'],
+                    object_list)
+            }
+
+        else:
+            table_dict = {
+                'title': elem.title,
+                'object_list': elem.data_from,
+                'table': elem.table
+            }
 
         render_context['elements'][elem.slug] = table_dict
 
-    qset = report.base_queryset.all()
+    # Fill catchall and except-catchall
+
+    catchall = report.base_queryset.all()
+    for key, filters in render_context['catchall'].items():
+        q = Q(filters[0])
+        for filter in filters[1:]:
+            q |= filter
+        render_context['catchall'][key] = catchall.filter(q)
+
+    except_catchall = report.base_queryset.all()
     for key, filters in render_context['catchall'].items():
         for filter in filters:
-            qset = qset.exclude(filter)
-        render_context['except_catchall'][key] = qset
+            except_catchall = except_catchall.exclude(filter)
+        render_context['except_catchall'][key] = except_catchall
+
+    for key, elem in render_context['elements']:
+        if elem['object_list'] == DATA_FROM_CATCHALL:
+            object_list = catchall
+        elif elem['object_list'] == DATA_FROM_EXCEPT_CATCHALL:
+            object_list = except_catchall
+
+        elem['object_list'] = object_list
+        elem['table'] = table(
+            elem['table'],
+            parent_context['request'],
+            object_list)
 
     return render_context
 
