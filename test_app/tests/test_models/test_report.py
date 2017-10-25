@@ -1,9 +1,13 @@
 # -*- encoding: utf-8 -*-
-
 import pytest
-from django.core.exceptions import ImproperlyConfigured
+from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ImproperlyConfigured, ValidationError
+from model_mommy import mommy
 
-from flexible_reports.models.report import Report, get_reports_template
+from flexible_reports.models.datasource import Datasource
+from flexible_reports.models.report import Report, get_reports_template, \
+    DATA_FROM_DATASOURCE, ReportElement, DATA_FROM_CATCHALL, \
+    DATA_FROM_EXCEPT_CATCHALL
 from test_app.models import MyTestFoo
 
 
@@ -19,3 +23,48 @@ def test_report():
 
 def test_get_reports_template():
     assert get_reports_template() is not None
+
+
+@pytest.mark.django_db
+def test_reportelement():
+    mtf = ContentType.objects.get_for_model(Report)
+    ds = mommy.make(Datasource, base_model=mtf, dsl_query="slug = 'foo'")
+
+    r = mommy.make(Report)
+
+    re = mommy.make(
+        ReportElement,
+        parent=r,
+        data_from=DATA_FROM_CATCHALL,
+        datasource=ds)
+    with pytest.raises(ValidationError):
+        re.clean()
+
+    re = mommy.make(
+        ReportElement,
+        parent=r,
+        data_from=DATA_FROM_EXCEPT_CATCHALL,
+        datasource=ds)
+    with pytest.raises(ValidationError):
+        re.clean()
+
+    re = mommy.make(
+        ReportElement,
+        parent=r,
+        data_from=DATA_FROM_DATASOURCE,
+        datasource=None)
+    with pytest.raises(ValidationError):
+        re.clean()
+
+    re = mommy.make(ReportElement, parent=r, data_from=DATA_FROM_CATCHALL,
+                    datasource=None)
+    re.clean()
+
+    re = mommy.make(ReportElement, parent=r,
+                    data_from=DATA_FROM_EXCEPT_CATCHALL,
+                    datasource=None)
+    re.clean()
+
+    re = mommy.make(ReportElement, parent=r, data_from=DATA_FROM_DATASOURCE,
+                    datasource=ds)
+    re.clean()

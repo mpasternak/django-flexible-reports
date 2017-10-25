@@ -27,6 +27,7 @@ class ReportElementInline(SortableHiddenMixin,
 
     fields = ['title',
               'slug',
+              'data_from',
               'datasource',
               'table',
               'position']

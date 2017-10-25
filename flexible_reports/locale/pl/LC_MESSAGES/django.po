@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-08-31 02:28+0200\n"
-"PO-Revision-Date: 2017-08-31 02:29+0200\n"
+"POT-Creation-Date: 2017-10-25 13:00+0200\n"
+"PO-Revision-Date: 2017-10-25 13:01+0200\n"
 "Last-Translator: Michał Pasternak <michal.dtz@gmail.com>\n"
 "Language-Team: \n"
 "Language: pl\n"
@@ -32,19 +32,19 @@ msgstr ""
 msgid "DSL query"
 msgstr "Zapytanie w języku DSL"
 
-#: flexible_reports/admin/report.py:54
+#: flexible_reports/admin/report.py:55
 msgid "Report's elements"
 msgstr "Składowe raportu"
 
-#: flexible_reports/admin/table.py:93 flexible_reports/models/column.py:92
+#: flexible_reports/admin/table.py:92 flexible_reports/models/column.py:92
 msgid "Columns"
 msgstr "Kolumny"
 
-#: flexible_reports/admin/table.py:99
+#: flexible_reports/admin/table.py:98
 msgid " (group name: "
 msgstr " (nazwa grupy: "
 
-#: flexible_reports/admin/table.py:105 flexible_reports/models/table.py:87
+#: flexible_reports/admin/table.py:104 flexible_reports/models/table.py:87
 msgid "Sort option"
 msgstr "Jak sortować"
 
@@ -106,7 +106,7 @@ msgstr ""
 "Ta wartość może zawierać odnośniki do pól powiązanych zapisaną w notacji z "
 "kropką. "
 
-#: flexible_reports/models/column.py:39 flexible_reports/models/report.py:41
+#: flexible_reports/models/column.py:39 flexible_reports/models/report.py:73
 msgid "Template"
 msgstr "Templatka"
 
@@ -227,6 +227,7 @@ msgid "Output only distinct records"
 msgstr "Wyświetla jedynie unikalne rekordy, bez powtórzeń"
 
 #: flexible_reports/models/datasource.py:30
+#: flexible_reports/models/report.py:27
 msgid "Datasource"
 msgstr "Źródło danych"
 
@@ -234,11 +235,53 @@ msgstr "Źródło danych"
 msgid "Datasources"
 msgstr "Źródła danych"
 
-#: flexible_reports/models/report.py:61
+#: flexible_reports/models/report.py:16
+msgid "Parent"
+msgstr "Rodzic"
+
+#: flexible_reports/models/report.py:18
+msgid "Data from"
+msgstr "Dane z"
+
+#: flexible_reports/models/report.py:20
+msgid "datasource"
+msgstr "źródło danych"
+
+#: flexible_reports/models/report.py:21
+msgid "catchall"
+msgstr "wszystkie źródła danych raportu"
+
+#: flexible_reports/models/report.py:22
+msgid "except catchall"
+msgstr "wszystkie rekordy oprócz pasujących do źródeł danych raportu"
+
+#: flexible_reports/models/report.py:31 flexible_reports/models/table.py:59
+#: flexible_reports/models/table.py:121
+msgid "Table"
+msgstr "Tabela"
+
+#: flexible_reports/models/report.py:32
+msgid "Slug"
+msgstr "Skrót"
+
+#: flexible_reports/models/report.py:40
+msgid ""
+"In case when data is from catchall or except-catchall, please specify an "
+"empty datasource."
+msgstr ""
+"W przypadku, gdy dane pochodzą ze wszystkich źródeł danych raportu bądź "
+"wszystkich rekordów oprócz źródeł danych raportu, proszę o wybranie pustego "
+"źródła danych. "
+
+#: flexible_reports/models/report.py:47
+msgid "Please specify a datasource."
+msgstr "Proszę o określenie źródła danych. "
+
+#: flexible_reports/models/report.py:93
 msgid "Reports"
 msgstr "Raporty"
 
-#: flexible_reports/models/report.py:62
+#: flexible_reports/models/report.py:94
 msgid "Report"
 msgstr "Raport"
 
@@ -283,10 +326,6 @@ msgid ""
 msgstr ""
 "ta tabela będzie sortowana razem z innymi w grupie tabel; musisz wprowadzić "
 "nazwę grupy"
-
-#: flexible_reports/models/table.py:59 flexible_reports/models/table.py:121
-msgid "Table"
-msgstr "Tabela"
 
 #: flexible_reports/models/table.py:63
 msgid "Descending"
