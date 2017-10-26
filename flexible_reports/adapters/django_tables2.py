@@ -188,6 +188,7 @@ def _report(report, parent_context):
 
         else:
             table_dict = {
+                '_catchall': True,
                 'title': elem.title,
                 'object_list': elem.data_from,
                 'table': elem.table
@@ -197,6 +198,12 @@ def _report(report, parent_context):
 
     # Fill catchall and except-catchall
 
+    except_catchall = report.base_queryset.all()
+    for key, filters in render_context['catchall'].items():
+        for filter in filters:
+            except_catchall = except_catchall.exclude(filter)
+        render_context['except_catchall'][key] = except_catchall
+
     catchall = report.base_queryset.all()
     for key, filters in render_context['catchall'].items():
         q = Q(filters[0])
@@ -204,17 +211,18 @@ def _report(report, parent_context):
             q |= filter
         render_context['catchall'][key] = catchall.filter(q)
 
-    except_catchall = report.base_queryset.all()
-    for key, filters in render_context['catchall'].items():
-        for filter in filters:
-            except_catchall = except_catchall.exclude(filter)
-        render_context['except_catchall'][key] = except_catchall
+    for key, elem in render_context['elements'].items():
+        if '_catchall' not in elem:
+            continue
 
-    for key, elem in render_context['elements']:
         if elem['object_list'] == DATA_FROM_CATCHALL:
             object_list = catchall
+
         elif elem['object_list'] == DATA_FROM_EXCEPT_CATCHALL:
             object_list = except_catchall
+
+        elif elem['object_list'] == DATA_FROM_DATASOURCE:
+            raise Exception("EDOOFUS")
 
         elem['object_list'] = object_list
         elem['table'] = table(

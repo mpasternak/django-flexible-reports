@@ -8,6 +8,8 @@ from model_mommy import mommy
 from flexible_reports.adapters import django_tables2
 from flexible_reports.models import Report, Table, ReportElement, Column, \
     Datasource
+from flexible_reports.models.report import DATA_FROM_EXCEPT_CATCHALL, \
+    DATA_FROM_DATASOURCE
 from ..models import MyTestFoo
 
 
@@ -82,9 +84,14 @@ def test_catchall_except_catchall():
     t = mommy.make(Table, base_model=mtf)
     c = mommy.make(Column, parent=t)
     ds = mommy.make(Datasource, base_model=mtf, dsl_query="i < 3")
-    re = mommy.make(ReportElement, table=t, parent=r, datasource=ds)
-
+    re = mommy.make(ReportElement, table=t, parent=r, datasource=ds,
+                    data_from=DATA_FROM_DATASOURCE)
+    re.clean()
+    rex = mommy.make(ReportElement, table=t, parent=r, datasource=None,
+                     data_from=DATA_FROM_EXCEPT_CATCHALL)
+    rex.clean()
     r.set_base_queryset(MyTestFoo.objects.all())
 
     res = django_tables2._report(r, {'request': None})
     assert res['except_catchall']['test_app_mytestfoo'].count() == 1
+
