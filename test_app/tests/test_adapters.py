@@ -93,7 +93,11 @@ def test_catchall_except_catchall(rf):
                     data_from=DATA_FROM_DATASOURCE)
     re.clean()
 
-    rex = mommy.make(ReportElement, table=t, parent=r, datasource=None,
+    rex = mommy.make(ReportElement,
+                     table=t,
+                     parent=r,
+                     datasource=None,
+                     base_model=mtf,
                      data_from=DATA_FROM_EXCEPT_CATCHALL)
     rex.clean()
 
