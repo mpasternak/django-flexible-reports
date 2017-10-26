@@ -6,7 +6,7 @@ from model_mommy import mommy
 
 from flexible_reports.models.datasource import Datasource
 from flexible_reports.models.report import Report, get_reports_template, \
-    DATA_FROM_DATASOURCE, ReportElement, DATA_FROM_CATCHALL, \
+    DATA_FROM_DATASOURCE, ReportElement, \
     DATA_FROM_EXCEPT_CATCHALL
 from test_app.models import MyTestFoo
 
@@ -35,36 +35,29 @@ def test_reportelement():
     re = mommy.make(
         ReportElement,
         parent=r,
-        data_from=DATA_FROM_CATCHALL,
-        datasource=ds)
+        data_from=DATA_FROM_EXCEPT_CATCHALL,
+        datasource=ds,
+        base_model=mtf)
     with pytest.raises(ValidationError):
         re.clean()
 
-    re = mommy.make(
-        ReportElement,
-        parent=r,
-        data_from=DATA_FROM_EXCEPT_CATCHALL,
-        datasource=ds)
-    with pytest.raises(ValidationError):
-        re.clean()
+    re.datasource = None
+    re.clean()
 
     re = mommy.make(
         ReportElement,
         parent=r,
         data_from=DATA_FROM_DATASOURCE,
-        datasource=None)
+        datasource=None,
+        base_model=None)
     with pytest.raises(ValidationError):
         re.clean()
 
-    re = mommy.make(ReportElement, parent=r, data_from=DATA_FROM_CATCHALL,
-                    datasource=None)
+    re.base_model = mtf
+    re.datasource = ds
+    with pytest.raises(ValidationError):
+        re.clean()
+
+    re.base_model = None
     re.clean()
 
-    re = mommy.make(ReportElement, parent=r,
-                    data_from=DATA_FROM_EXCEPT_CATCHALL,
-                    datasource=None)
-    re.clean()
-
-    re = mommy.make(ReportElement, parent=r, data_from=DATA_FROM_DATASOURCE,
-                    datasource=ds)
-    re.clean()

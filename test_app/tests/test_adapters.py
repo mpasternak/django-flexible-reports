@@ -73,25 +73,31 @@ def test_report(rf):
 
 
 @pytest.mark.django_db
-def test_catchall_except_catchall():
-    mommy.make(MyTestFoo, i=1)
-    mommy.make(MyTestFoo, i=2)
-    mommy.make(MyTestFoo, i=3)
+def test_catchall_except_catchall(rf):
+    for a in range(1, 6):
+        mommy.make(MyTestFoo, i=a)
 
     mtf = ContentType.objects.get_for_model(MyTestFoo)
 
     r = mommy.make(Report)
     t = mommy.make(Table, base_model=mtf)
     c = mommy.make(Column, parent=t)
-    ds = mommy.make(Datasource, base_model=mtf, dsl_query="i < 3")
+
+    ds = mommy.make(Datasource, base_model=mtf, dsl_query="i > 0 AND i < 3")
     re = mommy.make(ReportElement, table=t, parent=r, datasource=ds,
                     data_from=DATA_FROM_DATASOURCE)
     re.clean()
+
+    ds = mommy.make(Datasource, base_model=mtf, dsl_query="i > 3")
+    re = mommy.make(ReportElement, table=t, parent=r, datasource=ds,
+                    data_from=DATA_FROM_DATASOURCE)
+    re.clean()
+
     rex = mommy.make(ReportElement, table=t, parent=r, datasource=None,
                      data_from=DATA_FROM_EXCEPT_CATCHALL)
     rex.clean()
+
     r.set_base_queryset(MyTestFoo.objects.all())
 
     res = django_tables2._report(r, {'request': None})
     assert res['except_catchall']['test_app_mytestfoo'].count() == 1
-

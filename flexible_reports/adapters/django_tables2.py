@@ -14,8 +14,7 @@ from django.utils.safestring import mark_safe
 from django_tables2.columns.templatecolumn import TemplateColumn, Column
 from django_tables2.export.export import TableExport
 from django_tables2.tables import Table
-from flexible_reports.models.report import DATA_FROM_DATASOURCE, \
-    DATA_FROM_EXCEPT_CATCHALL, DATA_FROM_CATCHALL
+from flexible_reports.models.report import DATA_FROM_DATASOURCE
 from tablib.core import Databook, Dataset
 
 
@@ -170,9 +169,10 @@ def _report(report, parent_context):
             filter = datasource.get_filter(context=report.context)
             object_list = report.base_queryset.filter(filter)
 
-            render_context['catchall'][
-                "%s_%s" % (datasource.base_model.app_label,
-                           datasource.base_model.model)].append(filter)
+            ds_key = "%s_%s" % (datasource.base_model.app_label,
+                                datasource.base_model.model)
+
+            render_context['catchall'][ds_key].append(object_list)
 
             if datasource.distinct:
                 object_list = object_list.distinct()
@@ -188,9 +188,8 @@ def _report(report, parent_context):
 
         else:
             table_dict = {
-                '_catchall': True,
+                'except_catchall': True,
                 'title': elem.title,
-                'object_list': elem.data_from,
                 'table': elem.table
             }
 
@@ -199,30 +198,15 @@ def _report(report, parent_context):
     # Fill catchall and except-catchall
 
     except_catchall = report.base_queryset.all()
-    for key, filters in render_context['catchall'].items():
-        for filter in filters:
-            except_catchall = except_catchall.exclude(filter)
+    for key, querysets in render_context['catchall'].items():
+        for queryset in querysets:
+            except_catchall = except_catchall.exclude(
+                pk__in=queryset.values("pk"))
         render_context['except_catchall'][key] = except_catchall
 
-    catchall = report.base_queryset.all()
-    for key, filters in render_context['catchall'].items():
-        q = Q(filters[0])
-        for filter in filters[1:]:
-            q |= filter
-        render_context['catchall'][key] = catchall.filter(q)
-
     for key, elem in render_context['elements'].items():
-        if '_catchall' not in elem:
+        if 'except_catchall' not in elem:
             continue
-
-        if elem['object_list'] == DATA_FROM_CATCHALL:
-            object_list = catchall
-
-        elif elem['object_list'] == DATA_FROM_EXCEPT_CATCHALL:
-            object_list = except_catchall
-
-        elif elem['object_list'] == DATA_FROM_DATASOURCE:
-            raise Exception("EDOOFUS")
 
         elem['object_list'] = object_list
         elem['table'] = table(

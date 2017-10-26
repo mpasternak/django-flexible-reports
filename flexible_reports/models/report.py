@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
 from django.template.loader import get_template
@@ -8,7 +9,6 @@ from .behaviors import Orderable, Titled
 from .validators import TemplateValidator
 
 DATA_FROM_DATASOURCE = 0
-DATA_FROM_CATCHALL = 1
 DATA_FROM_EXCEPT_CATCHALL = 2
 
 class ReportElement(Titled, Orderable):
@@ -18,14 +18,27 @@ class ReportElement(Titled, Orderable):
         verbose_name=_("Data from"),
         choices=[
             (DATA_FROM_DATASOURCE, _("datasource")),
-            (DATA_FROM_CATCHALL, _("catchall")),
             (DATA_FROM_EXCEPT_CATCHALL, _("except catchall"))
         ],
         default=DATA_FROM_DATASOURCE)
 
     datasource = models.ForeignKey(
-        'flexible_reports.Datasource', verbose_name=_("Datasource"),
-        null=True, blank=True)
+        'flexible_reports.Datasource',
+        verbose_name=_("Datasource"),
+        null=True,
+        blank=True,
+        help_text=_("Fill only if 'datasource' has been chosen in 'Data from' "
+                    "field")
+    )
+
+    base_model = models.ForeignKey(
+        ContentType,
+        verbose_name=_("Base model"),
+        null=True, blank=True,
+        help_text=_(
+            "Fill only if 'except catchall' is selected in 'Data from' "
+            "field")
+    )
 
     table = models.ForeignKey('flexible_reports.Table',
                               verbose_name=_("Table"))
@@ -37,14 +50,27 @@ class ReportElement(Titled, Orderable):
                 raise ValidationError(
                     {"datasource": [ValidationError(
                         _(
-                            "In case when data is from catchall or except-catchall, "
+                            "In case when data is from except-catchall, "
                             "please specify an empty datasource."))]})
+
+            if self.base_model is None:
+                raise ValidationError(
+                    {"base_model": [ValidationError(
+                        _(
+                            "In case when data is from except-catchall, "
+                            "please specify a base model."))]})
+
 
         if self.data_from == DATA_FROM_DATASOURCE:
             if self.datasource is None:
                 raise ValidationError(
                     {"datasource": [ValidationError(
                         _("Please specify a datasource."))]})
+
+            if self.base_model is not None:
+                raise ValidationError(
+                    {"base_model": [ValidationError(
+                        _("Please specify an empty base model."))]})
 
 
     class Meta:

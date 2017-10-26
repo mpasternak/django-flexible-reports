@@ -29,6 +29,7 @@ class ReportElementInline(SortableHiddenMixin,
               'slug',
               'data_from',
               'datasource',
+              'base_model',
               'table',
               'position']
 
