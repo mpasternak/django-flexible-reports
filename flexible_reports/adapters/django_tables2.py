@@ -201,7 +201,7 @@ def _report(report, parent_context):
     for key, querysets in render_context['catchall'].items():
         for queryset in querysets:
             except_catchall = except_catchall.exclude(
-                pk__in=queryset.values("pk"))
+                pk__in=list(queryset.values_list("pk", flat=True)))
         render_context['except_catchall'][key] = except_catchall
 
     for key, elem in render_context['elements'].items():
