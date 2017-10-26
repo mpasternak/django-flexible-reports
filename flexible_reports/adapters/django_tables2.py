@@ -188,7 +188,7 @@ def _report(report, parent_context):
 
         else:
             table_dict = {
-                'except_catchall': True,
+                'except_catchall': elem.base_model,
                 'title': elem.title,
                 'table': elem.table
             }
@@ -208,6 +208,11 @@ def _report(report, parent_context):
         if 'except_catchall' not in elem:
             continue
 
+        base_model = elem['except_catchall']
+
+        key = "%s_%s" % (base_model.app_label, base_model.name)
+
+        object_list = render_context['except_catchall'][key]
         elem['object_list'] = object_list
         elem['table'] = table(
             elem['table'],

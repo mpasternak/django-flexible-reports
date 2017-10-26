@@ -105,3 +105,4 @@ def test_catchall_except_catchall(rf):
 
     res = django_tables2._report(r, {'request': None})
     assert res['except_catchall']['test_app_mytestfoo'].count() == 1
+    assert res['except_catchall']['test_app_mytestfoo'][0].i == 3
