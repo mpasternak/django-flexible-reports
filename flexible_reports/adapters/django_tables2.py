@@ -162,7 +162,8 @@ def _report(report, parent_context):
         'except_catchall': defaultdict(lambda: [])
     })
 
-    for elem in report.reportelement_set.all().select_related():
+    for elem in report.reportelement_set.all().prefetch_related(
+        "datasource", "datasource__base_model", "table").select_related():
 
         if elem.data_from == DATA_FROM_DATASOURCE:
             datasource = elem.datasource
@@ -172,7 +173,7 @@ def _report(report, parent_context):
             ds_key = "%s_%s" % (datasource.base_model.app_label,
                                 datasource.base_model.model)
 
-            render_context['catchall'][ds_key].append(object_list)
+            render_context['catchall'][ds_key].append(filter)
 
             if datasource.distinct:
                 object_list = object_list.distinct()
@@ -195,13 +196,21 @@ def _report(report, parent_context):
 
         render_context['elements'][elem.slug] = table_dict
 
-    # Fill catchall and except-catchall
-
+    # Fill except-catchall
     except_catchall = report.base_queryset.all()
-    for key, querysets in render_context['catchall'].items():
-        for queryset in querysets:
-            except_catchall = except_catchall.exclude(
-                pk__in=list(queryset.values_list("pk", flat=True)))
+    q = None
+    for key, filters in render_context['catchall'].items():
+        if not filters:
+            continue
+
+        if q is None:
+            q = filters[0]
+        for filter in filters[1:]:
+            q |= filter
+
+        except_catchall = except_catchall.exclude(
+            pk__in=report.base_queryset.filter(q).values_list("pk", flat=True))
+
         render_context['except_catchall'][key] = except_catchall
 
     for key, elem in render_context['elements'].items():
