@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-10-25 13:00+0200\n"
-"PO-Revision-Date: 2017-10-25 13:01+0200\n"
+"POT-Creation-Date: 2017-10-28 01:24+0200\n"
+"PO-Revision-Date: 2017-10-28 01:30+0200\n"
 "Last-Translator: Michał Pasternak <michal.dtz@gmail.com>\n"
 "Language-Team: \n"
 "Language: pl\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
 "|| n%100>=20) ? 1 : 2);\n"
-"X-Generator: Poedit 2.0.2\n"
+"X-Generator: Poedit 2.0.4\n"
 
 #: flexible_reports/admin/datasource.py:37
 #, python-format
@@ -32,7 +32,7 @@ msgstr ""
 msgid "DSL query"
 msgstr "Zapytanie w języku DSL"
 
-#: flexible_reports/admin/report.py:55
+#: flexible_reports/admin/report.py:56
 msgid "Report's elements"
 msgstr "Składowe raportu"
 
@@ -48,7 +48,8 @@ msgstr " (nazwa grupy: "
 msgid "Sort option"
 msgstr "Jak sortować"
 
-#: flexible_reports/models/behaviors.py:10 flexible_reports/models/table.py:83
+#: flexible_reports/models/behaviors.py:10 flexible_reports/models/report.py:36
+#: flexible_reports/models/table.py:83
 msgid "Base model"
 msgstr "Podstawowy model"
 
@@ -106,7 +107,7 @@ msgstr ""
 "Ta wartość może zawierać odnośniki do pól powiązanych zapisaną w notacji z "
 "kropką. "
 
-#: flexible_reports/models/column.py:39 flexible_reports/models/report.py:73
+#: flexible_reports/models/column.py:39 flexible_reports/models/report.py:99
 msgid "Template"
 msgstr "Templatka"
 
@@ -248,40 +249,55 @@ msgid "datasource"
 msgstr "źródło danych"
 
 #: flexible_reports/models/report.py:21
-msgid "catchall"
-msgstr "wszystkie źródła danych raportu"
-
-#: flexible_reports/models/report.py:22
 msgid "except catchall"
 msgstr "wszystkie rekordy oprócz pasujących do źródeł danych raportu"
 
-#: flexible_reports/models/report.py:31 flexible_reports/models/table.py:59
+#: flexible_reports/models/report.py:30
+msgid "Fill only if 'datasource' has been chosen in 'Data from' field"
+msgstr "Wybierz jedynie, gdy „źródło danych” zostało wybrane w polu „Dane z”"
+
+#: flexible_reports/models/report.py:39
+msgid "Fill only if 'except catchall' is selected in 'Data from' field"
+msgstr ""
+"Wybierz jedynie, gdy „wszystkie rekordy oprócz pasujących do źródeł danych "
+"raportu” zostało wybrane w polu „Dane z”"
+
+#: flexible_reports/models/report.py:44 flexible_reports/models/table.py:59
 #: flexible_reports/models/table.py:121
 msgid "Table"
 msgstr "Tabela"
 
-#: flexible_reports/models/report.py:32
+#: flexible_reports/models/report.py:45
 msgid "Slug"
 msgstr "Skrót"
 
-#: flexible_reports/models/report.py:40
+#: flexible_reports/models/report.py:53
 msgid ""
-"In case when data is from catchall or except-catchall, please specify an "
-"empty datasource."
+"In case when data is from except-catchall, please specify an empty "
+"datasource."
 msgstr ""
-"W przypadku, gdy dane pochodzą ze wszystkich źródeł danych raportu bądź "
-"wszystkich rekordów oprócz źródeł danych raportu, proszę o wybranie pustego "
-"źródła danych. "
+"W przypadku gdy dane pochodzą ze wszystkich rekordów prócz pasujących do "
+"źródeł danych, proszę nie wybierać źródła danych."
 
-#: flexible_reports/models/report.py:47
+#: flexible_reports/models/report.py:60
+msgid "In case when data is from except-catchall, please specify a base model."
+msgstr ""
+"W przypadku gdy dane pochodzą ze wszystkich rekordów prócz pasujących do "
+"źródeł danych, proszę wybrać podstawowy model danych."
+
+#: flexible_reports/models/report.py:68
 msgid "Please specify a datasource."
-msgstr "Proszę o określenie źródła danych. "
+msgstr "Proszę o określenie źródła danych."
 
-#: flexible_reports/models/report.py:93
+#: flexible_reports/models/report.py:73
+msgid "Please specify an empty base model."
+msgstr "Nie wybieraj modelu podstawowego."
+
+#: flexible_reports/models/report.py:119
 msgid "Reports"
 msgstr "Raporty"
 
-#: flexible_reports/models/report.py:94
+#: flexible_reports/models/report.py:120
 msgid "Report"
 msgstr "Raport"
 
@@ -383,6 +399,9 @@ msgstr "Proszę wpisać prefiks grupy, jeżeli chcesz sortować tą tabelę w gr
 #, python-format
 msgid "Cannot compile template (%(exception)s)"
 msgstr "Nie mogę skompilować kodu templatki (wyjątek: %(exception)s)"
+
+#~ msgid "catchall"
+#~ msgstr "wszystkie źródła danych raportu"
 
 #~ msgid "Subtitle"
 #~ msgstr "Podtytuł"
