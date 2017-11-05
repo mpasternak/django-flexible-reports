@@ -78,6 +78,8 @@ class ReportElement(Titled, Orderable):
             ('parent', 'slug')
         ]
         ordering = ('position',)
+        verbose_name = _("Report element")
+        verbose_name_plural = _("Report elements")
 
 
 def _get_template(name):

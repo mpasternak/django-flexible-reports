@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-10-28 01:24+0200\n"
-"PO-Revision-Date: 2017-10-28 01:30+0200\n"
+"POT-Creation-Date: 2017-11-05 16:30+0100\n"
+"PO-Revision-Date: 2017-11-05 16:30+0100\n"
 "Last-Translator: Michał Pasternak <michal.dtz@gmail.com>\n"
 "Language-Team: \n"
 "Language: pl\n"
@@ -107,7 +107,7 @@ msgstr ""
 "Ta wartość może zawierać odnośniki do pól powiązanych zapisaną w notacji z "
 "kropką. "
 
-#: flexible_reports/models/column.py:39 flexible_reports/models/report.py:99
+#: flexible_reports/models/column.py:39 flexible_reports/models/report.py:101
 msgid "Template"
 msgstr "Templatka"
 
@@ -293,11 +293,19 @@ msgstr "Proszę o określenie źródła danych."
 msgid "Please specify an empty base model."
 msgstr "Nie wybieraj modelu podstawowego."
 
-#: flexible_reports/models/report.py:119
+#: flexible_reports/models/report.py:81
+msgid "Report element"
+msgstr "Składowa raportu"
+
+#: flexible_reports/models/report.py:82
+msgid "Report elements"
+msgstr "Składowe raportu"
+
+#: flexible_reports/models/report.py:121
 msgid "Reports"
 msgstr "Raporty"
 
-#: flexible_reports/models/report.py:120
+#: flexible_reports/models/report.py:122
 msgid "Report"
 msgstr "Raport"
 
