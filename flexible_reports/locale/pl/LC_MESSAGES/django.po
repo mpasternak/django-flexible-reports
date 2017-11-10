@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-05 16:30+0100\n"
-"PO-Revision-Date: 2017-11-05 16:30+0100\n"
+"POT-Creation-Date: 2017-11-10 17:05-0600\n"
+"PO-Revision-Date: 2017-11-11 00:05+0100\n"
 "Last-Translator: Michał Pasternak <michal.dtz@gmail.com>\n"
 "Language-Team: \n"
 "Language: pl\n"
@@ -36,7 +36,7 @@ msgstr "Zapytanie w języku DSL"
 msgid "Report's elements"
 msgstr "Składowe raportu"
 
-#: flexible_reports/admin/table.py:92 flexible_reports/models/column.py:92
+#: flexible_reports/admin/table.py:92 flexible_reports/models/column.py:100
 msgid "Columns"
 msgstr "Kolumny"
 
@@ -179,17 +179,38 @@ msgstr "Templatka stopki"
 #: flexible_reports/models/column.py:84
 msgid ""
 "\n"
-"        Template for footer. Used only if \"Display totals\" is enabled. "
+"        Template for footer. Used only if \"Display totals\" is enabled. It "
+"is \n"
+"        rendered with 3 variables:\n"
+"        - *count* -- total count of rows in the table, \n"
+"        - *value* -- sum of this column's values (or row count if non-"
+"numeric),\n"
+"        - *error* -- string representation of exception in case an "
+"exception \n"
+"        occurs during addition of column's values. \n"
+"        \n"
+"        So, if the column values are numbers, just use {{ value }}. If you "
+"want \n"
+"        to output number of rows, just use {{ count }}. "
 msgstr ""
 "\n"
-"Templatka dla stopki. Używane jedynie, jeżeli zaznaczono „Wyświetlaj "
-"podsumowanie”. "
+"        Templatka dla stopki. Używana tylko gdy „Wyświetlaj podsumowanie” "
+"jest włączone. Templatka\n"
+"renderowana jest w kontekście 3 zmiennych: \n"
+"- *count* — całkowita ilość wierszy w tabeli,\n"
+"- *value* — suma wartości w tej kolumnie (lub całkowita ilość wierszy w "
+"tabeli, jeżeli wartości kolumny są nie-numeryczne),\n"
+"- *error* — tekstowa reprezentacja wyjątku w sytuacji, gdy wystąpi wyjątek "
+"podczas dodawania wartości tej kolumny. \n"
+"\n"
+"Zatem, jeżeli wartości tej kolumny to liczby, użyj {{ value }}. Jeżeli "
+"chcesz wyświetlić ilość wierszy, użyj {{ count }}. "
 
-#: flexible_reports/models/column.py:91 flexible_reports/models/table.py:61
+#: flexible_reports/models/column.py:99 flexible_reports/models/table.py:61
 msgid "Column"
 msgstr "Kolumna"
 
-#: flexible_reports/models/column.py:115
+#: flexible_reports/models/column.py:123
 #, python-format
 msgid ""
 "'%(attr_name)s' is not a valid value for base model "
@@ -198,7 +219,7 @@ msgstr ""
 "„%(attr_name)s” nie jest właściwą wartością dla modelu "
 "„%(base_model)s” (wyjątek: %(exception)s). "
 
-#: flexible_reports/models/column.py:129
+#: flexible_reports/models/column.py:137
 msgid ""
 "You marked this column as sortable. You must enter value into \"Attribute "
 "name\" field. "
@@ -206,11 +227,11 @@ msgstr ""
 "Zaznaczyłeś/aś tą kolumnę jako sortowalną. Musisz wprowadzić nazwę atrybutu "
 "w polu „Nazwa atrybutu”. "
 
-#: flexible_reports/models/column.py:139 flexible_reports/models/column.py:143
+#: flexible_reports/models/column.py:147 flexible_reports/models/column.py:151
 msgid "You must either enter a template for this column or an attribute name. "
 msgstr "Musisz uzupełnić kod templatki lub nazwę atrybutu dla tej kolumny. "
 
-#: flexible_reports/models/column.py:153
+#: flexible_reports/models/column.py:161
 msgid ""
 "If 'Display totals' is enabled, you should provide a footer template. "
 "Perhaps try with a very basic and default one, like '{{ value }}'. "
@@ -407,6 +428,14 @@ msgstr "Proszę wpisać prefiks grupy, jeżeli chcesz sortować tą tabelę w gr
 #, python-format
 msgid "Cannot compile template (%(exception)s)"
 msgstr "Nie mogę skompilować kodu templatki (wyjątek: %(exception)s)"
+
+#~ msgid ""
+#~ "\n"
+#~ "        Template for footer. Used only if \"Display totals\" is enabled. "
+#~ msgstr ""
+#~ "\n"
+#~ "Templatka dla stopki. Używane jedynie, jeżeli zaznaczono „Wyświetlaj "
+#~ "podsumowanie”. "
 
 #~ msgid "catchall"
 #~ msgstr "wszystkie źródła danych raportu"

@@ -82,7 +82,15 @@ class Column(Labelled, Orderable):
         blank=True,
         null=True,
         help_text=_("""
-        Template for footer. Used only if "Display totals" is enabled. """)
+        Template for footer. Used only if "Display totals" is enabled. It is 
+        rendered with 3 variables:
+        - *count* -- total count of rows in the table, 
+        - *value* -- sum of this column's values (or row count if non-numeric),
+        - *error* -- string representation of exception in case an exception 
+        occurs during addition of column's values. 
+        
+        So, if the column values are numbers, just use {{ value }}. If you want 
+        to output number of rows, just use {{ count }}. """)
     )
 
     class Meta:

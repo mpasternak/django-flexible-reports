@@ -10,6 +10,7 @@ from flexible_reports.models import Report, Table, ReportElement, Column, \
     Datasource
 from flexible_reports.models.report import DATA_FROM_EXCEPT_CATCHALL, \
     DATA_FROM_DATASOURCE
+from test_app.models import MyTestBar
 from ..models import MyTestFoo
 
 
@@ -106,3 +107,29 @@ def test_catchall_except_catchall(rf):
     res = django_tables2._report(r, {'request': None})
     assert res['except_catchall']['test_app_mytestfoo'].count() == 1
     assert res['except_catchall']['test_app_mytestfoo'][0].i == 3
+
+
+@pytest.mark.django_db
+def test_sum_text_field(rf):
+    for a in range(1, 6):
+        mommy.make(MyTestBar)
+
+    mtb = ContentType.objects.get_for_model(MyTestBar)
+
+    r = mommy.make(Report)
+    t = mommy.make(Table, base_model=mtb)
+    c = mommy.make(Column, parent=t, display_totals=True)
+
+    ds = mommy.make(Datasource, base_model=mtb, dsl_query='i = "my test bar"')
+    re = mommy.make(ReportElement, table=t, parent=r, datasource=ds,
+                    data_from=DATA_FROM_DATASOURCE,
+                    slug='lol')
+
+    r.set_base_queryset(MyTestBar.objects.all())
+
+    res = django_tables2._report(r, {'request': None})
+    lol = res['elements']['lol']
+
+    assert lol['table'].columns[0].has_footer()
+
+    assert lol['table'].columns[0].footer == "5"

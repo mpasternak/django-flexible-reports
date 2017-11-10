@@ -8,14 +8,14 @@ from tempfile import NamedTemporaryFile
 import bleach
 import lxml.html
 import pypandoc
-from django.db.models.query_utils import Q
 from django.template.base import Template, Context
 from django.utils.safestring import mark_safe
 from django_tables2.columns.templatecolumn import TemplateColumn, Column
 from django_tables2.export.export import TableExport
 from django_tables2.tables import Table
-from flexible_reports.models.report import DATA_FROM_DATASOURCE
 from tablib.core import Databook, Dataset
+
+from flexible_reports.models.report import DATA_FROM_DATASOURCE
 
 
 class CounterMixin:
@@ -35,13 +35,17 @@ class FooterMixin:
             self.render_footer = self._render_footer
 
     def _render_footer(self, table):
+        error = None
         try:
             value = sum([getattr(x, self.accessor)
                          for x in table.data])
         except Exception as e:
-            value = str(e)
+            error = str(e)
+            value = len(table.data)
 
-        context = Context({'value': value})
+        context = Context({'value': value,
+                           'error': error,
+                           'count': len(table.data)})
 
         return Template(
             self.footer_template
