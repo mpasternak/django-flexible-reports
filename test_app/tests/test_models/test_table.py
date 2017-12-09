@@ -17,6 +17,7 @@ def test_table():
     t.group_prefix = "foobar"
     t.clean()
 
+
 def test_sortoptions():
     t = Table(pk=5, group_prefix="foo")
 

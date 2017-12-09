@@ -2,9 +2,7 @@
 
 import pytest
 from django.contrib.contenttypes.models import ContentType
-from django.db.models.query_utils import Q
 from flexible_reports.models.datasource import Datasource
-from model_mommy import mommy
 from test_app.models import MyTestFoo, MyTestForeign
 
 
@@ -17,6 +15,7 @@ def test_datasource():
 
     assert d.get_model() == MyTestFoo
     assert str(d.get_filter()) == "(AND: ('i', 5))"
+
 
 @pytest.mark.django_db
 def test_datasource_foreign():

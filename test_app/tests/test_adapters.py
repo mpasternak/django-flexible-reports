@@ -24,20 +24,20 @@ def test_report(rf):
                    label="tmp",
                    base_model=ContentType.objects.get_for_model(MyTestFoo))
 
-    c = mommy.make(Column,
-                   label="Value of i",
-                   parent=t,
-                   attr_name="i",
-                   position=0,
-                   display_totals=True)
+    mommy.make(Column,
+               label="Value of i",
+               parent=t,
+               attr_name="i",
+               position=0,
+               display_totals=True)
 
-    c = mommy.make(Column,
-                   label="also value of i",
-                   parent=t,
-                   attr_name="i",
-                   template="",
-                   position=1,
-                   display_totals=False)
+    mommy.make(Column,
+               label="also value of i",
+               parent=t,
+               attr_name="i",
+               template="",
+               position=1,
+               display_totals=False)
 
     ds = mommy.make(Datasource,
                     base_model=ContentType.objects.get_for_model(MyTestFoo),
@@ -57,7 +57,7 @@ def test_report(rf):
     args = r, RequestContext(request, dict(request=request))
     res = django_tables2.as_html(*args)
 
-    assert res != None
+    assert res is not None
 
     bs = BeautifulSoup(res, "lxml")
     assert len(bs.table.tbody.find_all("td")) == 4
@@ -80,7 +80,7 @@ def test_catchall_except_catchall(rf):
 
     r = mommy.make(Report)
     t = mommy.make(Table, base_model=mtf)
-    c = mommy.make(Column, parent=t)
+    mommy.make(Column, parent=t)
 
     ds = mommy.make(Datasource, base_model=mtf, dsl_query="i > 0 AND i < 3")
     re = mommy.make(ReportElement, table=t, parent=r, datasource=ds,
@@ -116,12 +116,12 @@ def test_sum_text_field(rf):
 
     r = mommy.make(Report)
     t = mommy.make(Table, base_model=mtb)
-    c = mommy.make(Column, parent=t, display_totals=True)
+    mommy.make(Column, parent=t, display_totals=True)
 
     ds = mommy.make(Datasource, base_model=mtb, dsl_query='i = "my test bar"')
-    re = mommy.make(ReportElement, table=t, parent=r, datasource=ds,
-                    data_from=DATA_FROM_DATASOURCE,
-                    slug='lol')
+    mommy.make(ReportElement, table=t, parent=r, datasource=ds,
+               data_from=DATA_FROM_DATASOURCE,
+               slug='lol')
 
     r.set_base_queryset(MyTestBar.objects.all())
 

@@ -56,10 +56,10 @@ class install_lib(_install_lib):
         _install_lib.run(self)
 
 
-        
 if sys.argv[-1] == 'publish':
     try:
         import wheel
+
         print("Wheel version: ", wheel.__version__)
     except ImportError:
         print('Wheel library missing. Please run "pip install wheel"')
@@ -89,9 +89,9 @@ setup(
         'flexible_reports',
     ],
     include_package_data=True,
-    install_requires=['Django',] + [x.strip() for x in open(
-            os.path.join(os.path.dirname(__file__), 
-                         "requirements.txt")).readlines() if x.strip()],
+    install_requires=['Django', ] + [x.strip() for x in open(
+        os.path.join(os.path.dirname(__file__),
+                     "requirements.txt")).readlines() if x.strip()],
     license="MIT",
     zip_safe=False,
     keywords='django-flexible-reports',
@@ -105,5 +105,5 @@ setup(
         'Programming Language :: Python :: 3.6',
     ],
     cmdclass={'build': build, 'install_lib': install_lib,
-        'compile_translations': compile_translations}
+              'compile_translations': compile_translations}
 )

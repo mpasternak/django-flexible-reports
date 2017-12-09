@@ -15,10 +15,10 @@ def test_report(admin_client):
     ds = mommy.make(Datasource,
                     base_model=ContentType.objects.get_for_model(MyTestFoo),
                     dsl_query="i=5")
-    re = mommy.make(ReportElement,
-                    datasource=ds,
-                    parent=r)
+    mommy.make(ReportElement,
+               datasource=ds,
+               parent=r)
 
-    res = admin_client.get(
+    admin_client.get(
         reverse("admin:flexible_reports_report_changelist")
     )

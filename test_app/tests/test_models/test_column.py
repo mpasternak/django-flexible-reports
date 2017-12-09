@@ -5,7 +5,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from flexible_reports.models.column import Column
 from flexible_reports.models.table import Table
-from model_mommy import mommy
 from test_app.models import MyTestFoo, MyTestForeign
 
 
@@ -37,7 +36,6 @@ def test_column():
     c.display_totals = True
     with pytest.raises(ValidationError):
         c.clean()
-
 
 
 @pytest.mark.django_db

@@ -13,9 +13,8 @@ from django.utils.safestring import mark_safe
 from django_tables2.columns.templatecolumn import Column, TemplateColumn
 from django_tables2.export.export import TableExport
 from django_tables2.tables import Table
-from tablib.core import Databook, Dataset
-
 from flexible_reports.models.report import DATA_FROM_DATASOURCE
+from tablib.core import Databook, Dataset
 
 
 class CounterMixin:
