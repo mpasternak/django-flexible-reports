@@ -2,7 +2,6 @@
 
 import pytest
 from django.core.exceptions import ValidationError
-
 from flexible_reports.models.validators import TemplateValidator
 
 

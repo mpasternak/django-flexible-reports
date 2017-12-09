@@ -6,11 +6,11 @@ from django.core.exceptions import ValidationError
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django_dsl import compiler, exceptions
-
 from flexible_reports.admin.helpers import BiggerTextarea
-from .helpers import SmallerTextarea
+
 from .. import utils
 from ..models.datasource import Datasource
+from .helpers import SmallerTextarea
 
 
 class DatasourceForm(forms.ModelForm):

@@ -2,8 +2,6 @@
 import pytest
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
-from flexible_reports.models.datasource import Datasource
-
 from flexible_reports.admin.datasource import DatasourceForm
 from test_app.models import MyTestFoo
 

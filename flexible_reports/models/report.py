@@ -11,9 +11,12 @@ from .validators import TemplateValidator
 DATA_FROM_DATASOURCE = 0
 DATA_FROM_EXCEPT_CATCHALL = 2
 
+
 class ReportElement(Titled, Orderable):
     parent = models.ForeignKey('flexible_reports.Report',
-                               verbose_name=_("Parent"))
+                               verbose_name=_("Parent"),
+                               on_delete=models.CASCADE
+                               )
     data_from = models.IntegerField(
         verbose_name=_("Data from"),
         choices=[
@@ -28,7 +31,8 @@ class ReportElement(Titled, Orderable):
         null=True,
         blank=True,
         help_text=_("Fill only if 'datasource' has been chosen in 'Data from' "
-                    "field")
+                    "field"),
+        on_delete=models.CASCADE
     )
 
     base_model = models.ForeignKey(
@@ -37,11 +41,13 @@ class ReportElement(Titled, Orderable):
         null=True, blank=True,
         help_text=_(
             "Fill only if 'except catchall' is selected in 'Data from' "
-            "field")
+            "field"),
+        on_delete=models.CASCADE
     )
 
     table = models.ForeignKey('flexible_reports.Table',
-                              verbose_name=_("Table"))
+                              verbose_name=_("Table"),
+                              on_delete=models.CASCADE)
     slug = models.SlugField(max_length=200, verbose_name=_("Slug"))
 
     def clean(self):
@@ -60,7 +66,6 @@ class ReportElement(Titled, Orderable):
                             "In case when data is from except-catchall, "
                             "please specify a base model."))]})
 
-
         if self.data_from == DATA_FROM_DATASOURCE:
             if self.datasource is None:
                 raise ValidationError(
@@ -71,7 +76,6 @@ class ReportElement(Titled, Orderable):
                 raise ValidationError(
                     {"base_model": [ValidationError(
                         _("Please specify an empty base model."))]})
-
 
     class Meta:
         unique_together = [

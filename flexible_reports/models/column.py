@@ -4,11 +4,14 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from .behaviors import Orderable, Labelled
+from .behaviors import Labelled, Orderable
 
 
 class Column(Labelled, Orderable):
-    parent = models.ForeignKey('flexible_reports.Table')
+    parent = models.ForeignKey(
+        'flexible_reports.Table',
+        on_delete=models.CASCADE
+    )
 
     sortable = models.BooleanField(
         verbose_name=_("Sortable"),
@@ -65,7 +68,7 @@ class Column(Labelled, Orderable):
     strip_html_on_export = models.BooleanField(
         default=True,
         verbose_name=_("Strip HTML on export"),
-        help_text=_("""Strip HTML tags when exporting to other, non-browser 
+        help_text=_("""Strip HTML tags when exporting to other, non-browser
         formats, like MS Word or MS Excel. """)
     )
 
@@ -82,14 +85,14 @@ class Column(Labelled, Orderable):
         blank=True,
         null=True,
         help_text=_("""
-        Template for footer. Used only if "Display totals" is enabled. It is 
+        Template for footer. Used only if "Display totals" is enabled. It is
         rendered with 3 variables:
-        - *count* -- total count of rows in the table, 
+        - *count* -- total count of rows in the table,
         - *value* -- sum of this column's values (or row count if non-numeric),
-        - *error* -- string representation of exception in case an exception 
-        occurs during addition of column's values. 
-        
-        So, if the column values are numbers, just use {{ value }}. If you want 
+        - *error* -- string representation of exception in case an exception
+        occurs during addition of column's values.
+
+        So, if the column values are numbers, just use {{ value }}. If you want
         to output number of rows, just use {{ count }}. """)
     )
 
@@ -147,9 +150,9 @@ class Column(Labelled, Orderable):
                         _("You must either enter a template for this "
                           "column or an attribute name. "))],
                     "template": [
-                            ValidationError(
-                                _("You must either enter a template for this "
-                                  "column or an attribute name. "))
+                        ValidationError(
+                            _("You must either enter a template for this "
+                              "column or an attribute name. "))
                     ]
                 }
             )  # noqa

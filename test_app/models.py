@@ -15,4 +15,5 @@ class MyTestForeign(models.Model):
     django_dsl_shortcuts = {
         'i': 'parent__i'
     }
-    parent = models.ForeignKey(MyTestFoo)
+    parent = models.ForeignKey(MyTestFoo,
+                               on_delete=models.CASCADE)

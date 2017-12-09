@@ -8,6 +8,7 @@ class WithBaseModel(models.Model):
     base_model = models.ForeignKey(
         ContentType,
         verbose_name=_("Base model"),
+        on_delete=models.CASCADE
     )
 
     class Meta:

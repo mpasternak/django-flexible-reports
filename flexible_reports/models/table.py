@@ -6,7 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields.jsonb import JSONField
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.translation import ugettext_lazy as _, string_concat
+from django.utils.translation import string_concat, ugettext_lazy as _
 
 from .behaviors import Labelled, Orderable
 
@@ -56,9 +56,11 @@ AllSortOptions = OrderedDict(
 
 class ColumnOrder(Orderable):
     table = models.ForeignKey("flexible_reports.Table",
-                              verbose_name=_("Table"))
+                              verbose_name=_("Table"),
+                              on_delete=models.CASCADE)
     column = models.ForeignKey("flexible_reports.Column",
-                               verbose_name=_("Column"))
+                               verbose_name=_("Column"),
+                               on_delete=models.CASCADE)
     desc = models.BooleanField(
         _("Descending"),
         default=False
@@ -80,7 +82,8 @@ class Table(Labelled):
 
     base_model = models.ForeignKey(
         ContentType,
-        verbose_name=_("Base model"))
+        verbose_name=_("Base model"),
+        on_delete=models.CASCADE)
 
     sort_option = models.IntegerField(
         default=0,

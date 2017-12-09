@@ -2,8 +2,7 @@
 
 import pytest
 from django.core.exceptions import ValidationError
-
-from flexible_reports.models.table import SortInGroup, Table, SortIndividually
+from flexible_reports.models.table import SortIndividually, SortInGroup, Table
 
 
 @pytest.mark.django_db
@@ -17,6 +16,7 @@ def test_table():
 
     t.group_prefix = "foobar"
     t.clean()
+
 
 def test_sortoptions():
     t = Table(pk=5, group_prefix="foo")

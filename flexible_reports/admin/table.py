@@ -1,12 +1,11 @@
 # -*- encoding: utf-8 -*-
 from django import forms
 from django.contrib import admin
-from django.utils.translation import string_concat
-from django.utils.translation import ugettext_lazy as _
-
+from django.utils.translation import string_concat, ugettext_lazy as _
 from flexible_reports.models.table import AllSortOptions, SortInGroup
-from .helpers import SmallerTextarea, AverageTextarea, SortableHiddenMixin
-from ..models import Table, Column, ColumnOrder
+
+from ..models import Column, ColumnOrder, Table
+from .helpers import AverageTextarea, SmallerTextarea, SortableHiddenMixin
 
 
 class ColumnForm(forms.ModelForm):
