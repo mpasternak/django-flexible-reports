@@ -89,7 +89,7 @@ setup(
         'flexible_reports',
     ],
     include_package_data=True,
-    install_requires=[x.strip() for x in open(
+    install_requires=['Django',] + [x.strip() for x in open(
             os.path.join(os.path.dirname(__file__), 
                          "requirements.txt")).readlines() if x.strip()],
     license="MIT",

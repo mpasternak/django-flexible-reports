@@ -1,6 +1,5 @@
 django-dsl>=0.1.9
-django-tables2==1.10.0
-Django>=1.10
+django-tables2==1.16.0
 tablib>=0.11.5
 lxml>=3.8.0
 psycopg2>=2.7.1

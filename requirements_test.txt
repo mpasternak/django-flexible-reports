@@ -8,4 +8,5 @@ pytest-django==3.1.2
 pytest-coverage==0.0
 html5lib<=0.9999999
 BeautifulSoup4==4.6.0
-model-mommy==1.3.2
+# model-mommy==1.4.0
+git+https://github.com/vandersonmota/model_mommy.git
