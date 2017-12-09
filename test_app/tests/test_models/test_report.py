@@ -2,12 +2,11 @@
 import pytest
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, ValidationError
-from model_mommy import mommy
-
 from flexible_reports.models.datasource import Datasource
-from flexible_reports.models.report import Report, get_reports_template, \
-    DATA_FROM_DATASOURCE, ReportElement, \
-    DATA_FROM_EXCEPT_CATCHALL
+from flexible_reports.models.report import (
+    DATA_FROM_DATASOURCE, DATA_FROM_EXCEPT_CATCHALL, Report, ReportElement, get_reports_template,
+)
+from model_mommy import mommy
 from test_app.models import MyTestFoo
 
 
@@ -60,4 +59,3 @@ def test_reportelement():
 
     re.base_model = None
     re.clean()
-

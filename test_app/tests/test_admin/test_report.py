@@ -3,10 +3,9 @@
 import pytest
 from django.contrib.contenttypes.models import ContentType
 from django.urls.base import reverse
-from model_mommy import mommy
-
 from flexible_reports.models.datasource import Datasource
 from flexible_reports.models.report import Report, ReportElement
+from model_mommy import mommy
 from test_app.models import MyTestFoo
 
 

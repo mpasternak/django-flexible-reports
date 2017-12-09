@@ -3,10 +3,10 @@
 import os
 import re
 import sys
-from distutils.command.build import build as _build
-from setuptools.command.install_lib import install_lib as _install_lib
 from distutils.cmd import Command
+from distutils.command.build import build as _build
 
+from setuptools.command.install_lib import install_lib as _install_lib
 
 try:
     from setuptools import setup

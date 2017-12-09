@@ -3,14 +3,12 @@ import pytest
 from bs4 import BeautifulSoup
 from django.contrib.contenttypes.models import ContentType
 from django.template.context import RequestContext
-from model_mommy import mommy
-
 from flexible_reports.adapters import django_tables2
-from flexible_reports.models import Report, Table, ReportElement, Column, \
-    Datasource
-from flexible_reports.models.report import DATA_FROM_EXCEPT_CATCHALL, \
-    DATA_FROM_DATASOURCE
+from flexible_reports.models import Column, Datasource, Report, ReportElement, Table
+from flexible_reports.models.report import DATA_FROM_DATASOURCE, DATA_FROM_EXCEPT_CATCHALL
+from model_mommy import mommy
 from test_app.models import MyTestBar
+
 from ..models import MyTestFoo
 
 

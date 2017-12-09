@@ -3,10 +3,8 @@
 import pytest
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.query_utils import Q
-
 from flexible_reports.models.datasource import Datasource
 from model_mommy import mommy
-
 from test_app.models import MyTestFoo, MyTestForeign
 
 

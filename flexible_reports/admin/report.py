@@ -4,8 +4,7 @@ from django.contrib import admin
 from django.utils.translation import ugettext_lazy as _
 
 from flexible_reports.admin.helpers import BiggerTextarea
-from .helpers import SmallerTextarea
-from .helpers import SortableHiddenMixin
+from .helpers import SmallerTextarea, SortableHiddenMixin
 from ..models import Report
 from ..models.report import ReportElement
 
@@ -33,7 +32,7 @@ class ReportElementInline(SortableHiddenMixin,
               'table',
               'position']
 
-    prepopulated_fields = {'slug': ['title',]}
+    prepopulated_fields = {'slug': ['title', ]}
 
 
 class ReportForm(forms.ModelForm):
@@ -53,4 +52,5 @@ class ReportAdmin(admin.ModelAdmin):
 
     def elements(self, obj):
         return ", ".join([x.title for x in obj.reportelement_set.all()])
+
     elements.short_description = _("Report's elements")

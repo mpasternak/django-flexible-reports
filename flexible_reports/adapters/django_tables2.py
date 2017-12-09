@@ -8,9 +8,9 @@ from tempfile import NamedTemporaryFile
 import bleach
 import lxml.html
 import pypandoc
-from django.template.base import Template, Context
+from django.template.base import Context, Template
 from django.utils.safestring import mark_safe
-from django_tables2.columns.templatecolumn import TemplateColumn, Column
+from django_tables2.columns.templatecolumn import Column, TemplateColumn
 from django_tables2.export.export import TableExport
 from django_tables2.tables import Table
 from tablib.core import Databook, Dataset
@@ -113,8 +113,10 @@ def _table(table):
 
     if table.pk not in _table_cache:
         order_by = []
-        for column_order in table.columnorder_set.all() \
-            .select_related().order_by("position"):
+        for column_order in (
+            table.columnorder_set.all()
+                .select_related()
+                .order_by("position")):
             order_by.append(column_order.get())
         table.order_by = order_by
 
@@ -126,18 +128,18 @@ def _table(table):
                 prefix = table.get_prefix()
                 empty_text = mark_safe(table.empty_template)
 
-        extra_columns = []
         for c in table.column_set.all():
             label, klass = column(c)
             AdHocTable.base_columns[label] = klass
-            # extra_columns.append(column(c))
 
         _table_cache[table.pk] = AdHocTable
 
     return _table_cache[table.pk]
 
+
 def table(table, request, object_list):
     return _table(table)(data=object_list, request=request)
+
 
 def _report(report, parent_context):
     render_context = copy.copy(parent_context)
@@ -166,8 +168,9 @@ def _report(report, parent_context):
         'except_catchall': defaultdict(lambda: [])
     })
 
-    for elem in report.reportelement_set.all().prefetch_related(
-        "datasource", "datasource__base_model", "table").select_related():
+    reportelements_set = report.reportelement_set.all().prefetch_related(
+        "datasource", "datasource__base_model", "table").select_related()
+    for elem in reportelements_set:
 
         if elem.data_from == DATA_FROM_DATASOURCE:
             datasource = elem.datasource
@@ -268,6 +271,7 @@ def as_tablib_databook(report, parent_context):
         databook.add_sheet(dataset)
 
     return databook
+
 
 def as_tablib_dataset(report, parent_context):
     render_context = _report(report, parent_context)

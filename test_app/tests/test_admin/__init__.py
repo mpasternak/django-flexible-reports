@@ -2,8 +2,7 @@
 
 import pytest
 from django.urls.base import reverse
-
-from flexible_reports.models import Table, Report
+from flexible_reports.models import Report, Table
 from flexible_reports.models.datasource import Datasource
 
 
