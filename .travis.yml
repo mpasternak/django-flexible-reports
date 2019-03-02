@@ -14,18 +14,14 @@ language: python
 python:
   - "3.6"
 
-env:
-  - TOX_ENV=py36-django-110
-
-matrix:
-  fast_finish: true
-
 install:
   - pip install -r requirements.txt -r requirements_test.txt
   - pip install coveralls
 
 # command to run tests using coverage, e.g. python setup.py test
-script: tox -e $TOX_ENV
+script:
+  tox -e py36-django111
+  tox -e py36-django21
 
 after_success:
   - pytest --cov=flexible_reports
