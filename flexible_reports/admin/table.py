@@ -1,7 +1,8 @@
 # -*- encoding: utf-8 -*-
 from django import forms
 from django.contrib import admin
-from django.utils.translation import string_concat, ugettext_lazy as _
+from django.utils.text import format_lazy
+from django.utils.translation import ugettext_lazy as _
 from flexible_reports.models.table import AllSortOptions, SortInGroup
 
 from ..models import Column, ColumnOrder, Table
@@ -92,11 +93,11 @@ class TableAdmin(admin.ModelAdmin):
 
     def short_sort_option(self, obj):
         if obj.sort_option == SortInGroup.id:
-            return string_concat(
-                SortInGroup.label,
-                _(" (group name: "),
-                obj.group_prefix,
-                ")"
+            return format_lazy(
+                "{label}{group_name}{group_prefix})",
+                label=SortInGroup.label,
+                group_name=_(" (group name: "),
+                group_prefix=obj.group_prefix
             )
         return AllSortOptions[obj.sort_option].label
 

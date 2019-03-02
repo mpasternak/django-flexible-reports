@@ -6,7 +6,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields.jsonb import JSONField
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.translation import string_concat, ugettext_lazy as _
+from django.utils.text import format_lazy
+from django.utils.translation import ugettext_lazy as _
 
 from .behaviors import Labelled, Orderable
 
@@ -89,7 +90,7 @@ class Table(Labelled):
         default=0,
         verbose_name=_("Sort option"),
         choices=[
-            (x.id, string_concat(x.label, " - ", x.help_text))
+            (x.id, format_lazy("{label} - {text}", label=x.label, text=x.help_text))
             for x in AllSortOptions.values()
         ],
     )
