@@ -19,9 +19,9 @@ install:
   - pip install coveralls tox
 
 script:
-  - tox -e py36-django111
-  - tox -e py36-django21
-  - tox -e py36-django22
+  - tox -e py37-django111
+  - tox -e py37-django21
+  - tox -e py37-django22
 
 after_success:
   - pytest --cov=flexible_reports
