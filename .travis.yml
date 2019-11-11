@@ -18,11 +18,10 @@ install:
   - pip install -r requirements.txt -r requirements_test.txt
   - pip install coveralls tox
 
-# command to run tests using coverage, e.g. python setup.py test
 script:
-  tox -e py36-django111
-  tox -e py36-django21
-  tox -e py36-django22
+  - tox -e py36-django111
+  - tox -e py36-django21
+  - tox -e py36-django22
 
 after_success:
   - pytest --cov=flexible_reports
