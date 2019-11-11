@@ -8,4 +8,4 @@ pytest-cov
 html5lib<=0.9999999
 BeautifulSoup4==4.6.0
 model-mommy
-
+psycopg2-binary
