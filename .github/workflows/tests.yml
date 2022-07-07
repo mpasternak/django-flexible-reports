@@ -31,7 +31,7 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-          
+
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python ${{ matrix.python-version }}
@@ -40,7 +40,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        sudo apt install gettext
+        sudo apt install gettext pandoc
         python -m pip install --upgrade pip
         python -m pip install tox tox-gh-actions
     - name: Test with tox
