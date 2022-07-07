@@ -1,5 +1,6 @@
 # -*- coding: utf-8
 from __future__ import absolute_import, unicode_literals
+import os
 
 DEBUG = True
 USE_TZ = True
@@ -13,7 +14,7 @@ DATABASES = {
         "NAME": "flexible_reports",
         "USER": "postgres",
         "PASSWORD": None,
-        "HOST": "localhost",
+        "HOST": os.environ.get("POSTGRES_HOST", "localhost"),
         "PORT": 5432
     }
 }
