@@ -1,7 +1,11 @@
 # -*- encoding: utf-8 -*-
 from django.core.exceptions import ValidationError
 from django.template import Template
-from django.utils.translation import ugettext_lazy as _
+
+try:
+    from django.utils.translation import gettext_lazy as _
+except ImportError:
+    from django.utils.translation import ugettext_lazy as _
 
 
 def TemplateValidator(value):
@@ -11,6 +15,5 @@ def TemplateValidator(value):
         Template(value)
     except Exception as e:
         raise ValidationError(
-            _("Cannot compile template (%(exception)s)"),
-            params={"exception": e}
+            _("Cannot compile template (%(exception)s)"), params={"exception": e}
         )

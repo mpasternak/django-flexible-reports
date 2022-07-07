@@ -2,11 +2,16 @@
 import pytest
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, ValidationError
+from model_bakery import baker
+
 from flexible_reports.models.datasource import Datasource
 from flexible_reports.models.report import (
-    DATA_FROM_DATASOURCE, DATA_FROM_EXCEPT_CATCHALL, Report, ReportElement, get_reports_template,
+    DATA_FROM_DATASOURCE,
+    DATA_FROM_EXCEPT_CATCHALL,
+    Report,
+    ReportElement,
+    get_reports_template,
 )
-from model_bakery import baker
 from test_app.models import MyTestFoo
 
 
@@ -27,28 +32,30 @@ def test_get_reports_template():
 @pytest.mark.django_db
 def test_reportelement():
     mtf = ContentType.objects.get_for_model(Report)
-    ds = baker.bake(Datasource, base_model=mtf, dsl_query="slug = 'foo'")
+    ds = baker.make(Datasource, base_model=mtf, dsl_query="slug = 'foo'")
 
-    r = baker.bake(Report)
+    r = baker.make(Report)
 
-    re = baker.bake(
+    re = baker.make(
         ReportElement,
         parent=r,
         data_from=DATA_FROM_EXCEPT_CATCHALL,
         datasource=ds,
-        base_model=mtf)
+        base_model=mtf,
+    )
     with pytest.raises(ValidationError):
         re.clean()
 
     re.datasource = None
     re.clean()
 
-    re = baker.bake(
+    re = baker.make(
         ReportElement,
         parent=r,
         data_from=DATA_FROM_DATASOURCE,
         datasource=None,
-        base_model=None)
+        base_model=None,
+    )
     with pytest.raises(ValidationError):
         re.clean()
 

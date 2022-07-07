@@ -1,6 +1,11 @@
 # -*- encoding: utf-8 -*-
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+
+try:
+    from django.utils.translation import gettext_lazy as _
+except ImportError:
+    from django.utils.translation import ugettext_lazy as _
+
 from django_dsl import compiler
 from django_dsl.fields import DjangoDSLField
 
@@ -17,28 +22,26 @@ class Datasource(Labelled, WithBaseModel):
     self.base_model.objects.filter().
     """
 
-    dsl_query = DjangoDSLField(
-        verbose_name=_("DSL query"))
+    dsl_query = DjangoDSLField(verbose_name=_("DSL query"))
 
     distinct = models.BooleanField(
         default=True,
         verbose_name=_("Distinct"),
-        help_text=_("Output only distinct records")
+        help_text=_("Output only distinct records"),
     )
 
     class Meta:
         verbose_name = _("Datasource")
         verbose_name_plural = _("Datasources")
-        ordering = ('label',)
+        ordering = ("label",)
 
     def get_model(self):
         return self.base_model.model_class()
 
     def get_shortcuts(self):
-        return getattr(self.get_model(), 'django_dsl_shortcuts', {})
+        return getattr(self.get_model(), "django_dsl_shortcuts", {})
 
     def get_filter(self, context=None):
         return compiler.compile(
-            self.dsl_query,
-            shortcuts=self.get_shortcuts(),
-            context=context)
+            self.dsl_query, shortcuts=self.get_shortcuts(), context=context
+        )

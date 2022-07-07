@@ -1,17 +1,17 @@
 # -*- encoding: utf-8 -*-
-from flexible_reports.models.behaviors import Labelled, Titled
+from test_app.models import RealLabelled, RealTitled
 
 VAL = "foo"
 
 
 def test_labelled():
-    x = Labelled()
+    x = RealLabelled()
     x.label = VAL
 
     assert str(x) == VAL
 
 
 def test_titled():
-    x = Titled()
+    x = RealTitled()
     x.title = VAL
     assert str(x) == VAL

@@ -2,7 +2,12 @@
 from django import forms
 from django.contrib import admin
 from django.utils.text import format_lazy
-from django.utils.translation import ugettext_lazy as _
+
+try:
+    from django.utils.translation import gettext_lazy as _
+except ImportError:
+    from django.utils.translation import ugettext_lazy as _
+
 from flexible_reports.models.table import AllSortOptions, SortInGroup
 
 from ..models import Column, ColumnOrder, Table
@@ -12,31 +17,33 @@ from .helpers import AverageTextarea, SmallerTextarea, SortableHiddenMixin
 class ColumnForm(forms.ModelForm):
     class Meta:
         widgets = {
-            'label': SmallerTextarea,
-            'template': AverageTextarea,
-            'footer_template': SmallerTextarea,
-            'attrs': SmallerTextarea
+            "label": SmallerTextarea,
+            "template": AverageTextarea,
+            "footer_template": SmallerTextarea,
+            "attrs": SmallerTextarea,
         }
 
 
 class ColumnOrderForm(forms.ModelForm):
     def __init__(self, parent, *args, **kw):
         super(ColumnOrderForm, self).__init__(*args, **kw)
-        self.fields['column'].queryset = Column.objects.filter(parent=parent)
+        self.fields["column"].queryset = Column.objects.filter(parent=parent)
 
 
 class ColumnOrderInline(SortableHiddenMixin, admin.TabularInline):
     extra = 0
     model = ColumnOrder
-    fields = ['column', 'desc', 'position']
+    fields = ["column", "desc", "position"]
 
     def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
-        field = super(ColumnOrderInline, self).formfield_for_foreignkey(db_field, request, **kwargs)
-        if db_field.name == 'column':
+        field = super(ColumnOrderInline, self).formfield_for_foreignkey(
+            db_field, request, **kwargs
+        )
+        if db_field.name == "column":
             if request._parent_ is not None:
                 field.queryset = field.queryset.filter(
-                    parent=request._parent_,
-                    sortable=True)
+                    parent=request._parent_, sortable=True
+                )
 
             else:
                 field.queryset = field.queryset.none()
@@ -47,42 +54,40 @@ class ColumnInline(SortableHiddenMixin, admin.StackedInline):
     extra = 0
     model = Column
     form = ColumnForm
-    fields = ['label',
-              'attr_name',
-              'template',
-              'attrs',
-              'sortable',
-              'exclude_from_export',
-              'strip_html_on_export',
-              'display_totals',
-              'footer_template',
-              'position']
+    fields = [
+        "label",
+        "attr_name",
+        "template",
+        "attrs",
+        "sortable",
+        "exclude_from_export",
+        "strip_html_on_export",
+        "display_totals",
+        "footer_template",
+        "position",
+    ]
 
 
 class TableForm(forms.ModelForm):
     class Meta:
-        fields = ['label',
-                  'base_model',
-                  'sort_option',
-                  'group_prefix',
-                  'attrs',
-                  'empty_template',
-                  ]
+        fields = [
+            "label",
+            "base_model",
+            "sort_option",
+            "group_prefix",
+            "attrs",
+            "empty_template",
+        ]
         widgets = {
-            'label': SmallerTextarea,
-            'empty_template': SmallerTextarea,
-            'attrs': SmallerTextarea
+            "label": SmallerTextarea,
+            "empty_template": SmallerTextarea,
+            "attrs": SmallerTextarea,
         }
-
-    pass
 
 
 @admin.register(Table)
 class TableAdmin(admin.ModelAdmin):
-    list_display = ['label',
-                    'base_model',
-                    'short_sort_option',
-                    'columns']
+    list_display = ["label", "base_model", "short_sort_option", "columns"]
     inlines = [ColumnInline, ColumnOrderInline]
     form = TableForm
 
@@ -97,7 +102,7 @@ class TableAdmin(admin.ModelAdmin):
                 "{label}{group_name}{group_prefix})",
                 label=SortInGroup.label,
                 group_name=_(" (group name: "),
-                group_prefix=obj.group_prefix
+                group_prefix=obj.group_prefix,
             )
         return AllSortOptions[obj.sort_option].label
 

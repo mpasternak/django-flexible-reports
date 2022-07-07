@@ -1,7 +1,12 @@
 # -*- encoding: utf-8 -*-
 from django import forms
 from django.contrib import admin
-from django.utils.translation import ugettext_lazy as _
+
+try:
+    from django.utils.translation import gettext_lazy as _
+except ImportError:
+    from django.utils.translation import ugettext_lazy as _
+
 from flexible_reports.admin.helpers import BiggerTextarea
 
 from ..models import Report
@@ -12,41 +17,45 @@ from .helpers import SmallerTextarea, SortableHiddenMixin
 class ReportElementForm(forms.ModelForm):
     class Meta:
         widgets = {
-            'title': SmallerTextarea,
+            "title": SmallerTextarea,
         }
 
 
-class ReportElementInline(SortableHiddenMixin,
-                          admin.StackedInline):
+class ReportElementInline(SortableHiddenMixin, admin.StackedInline):
     extra = 0
 
     model = ReportElement
 
     form = ReportElementForm
 
-    fields = ['title',
-              'slug',
-              'data_from',
-              'datasource',
-              'base_model',
-              'table',
-              'position']
+    fields = [
+        "title",
+        "slug",
+        "data_from",
+        "datasource",
+        "base_model",
+        "table",
+        "position",
+    ]
 
-    prepopulated_fields = {'slug': ['title', ]}
+    prepopulated_fields = {
+        "slug": [
+            "title",
+        ]
+    }
 
 
 class ReportForm(forms.ModelForm):
     class Meta:
-        widgets = {
-            'title': SmallerTextarea,
-            'template': BiggerTextarea
-        }
+        widgets = {"title": SmallerTextarea, "template": BiggerTextarea}
 
 
 @admin.register(Report)
 class ReportAdmin(admin.ModelAdmin):
-    list_display = ['title', 'slug', 'elements']
-    inlines = [ReportElementInline, ]
+    list_display = ["title", "slug", "elements"]
+    inlines = [
+        ReportElementInline,
+    ]
     form = ReportForm
     prepopulated_fields = {"slug": ("title",)}
 

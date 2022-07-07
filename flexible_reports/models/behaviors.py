@@ -1,8 +1,10 @@
 # -*- encoding: utf-8 -*-
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
-
+try:
+    from django.utils.translation import gettext_lazy as _
+except ImportError:
+    from django.utils.translation import ugettext_lazy as _
 
 class WithBaseModel(models.Model):
     base_model = models.ForeignKey(
