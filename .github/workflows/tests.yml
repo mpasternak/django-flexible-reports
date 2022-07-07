@@ -4,6 +4,9 @@ on:
   - push
   - pull_request
 
+env:
+  POSTGRES_HOST: postgres
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -40,6 +43,3 @@ jobs:
         python -m pip install tox tox-gh-actions
     - name: Test with tox
       run: tox
-      env:
-          # The hostname used to communicate with the PostgreSQL service container
-          POSTGRES_HOST: postgres
