@@ -5,17 +5,17 @@ from django.contrib.contenttypes.models import ContentType
 from django.urls.base import reverse
 from flexible_reports.models.datasource import Datasource
 from flexible_reports.models.report import Report, ReportElement
-from model_mommy import mommy
+from model_bakery import baker
 from test_app.models import MyTestFoo
 
 
 @pytest.mark.django_db
 def test_report(admin_client):
-    r = mommy.make(Report)
-    ds = mommy.make(Datasource,
+    r = baker.bake(Report)
+    ds = baker.bake(Datasource,
                     base_model=ContentType.objects.get_for_model(MyTestFoo),
                     dsl_query="i=5")
-    mommy.make(ReportElement,
+    baker.bake(ReportElement,
                datasource=ds,
                parent=r)
 

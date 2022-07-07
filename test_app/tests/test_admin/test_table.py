@@ -4,7 +4,7 @@ import pytest
 from django.contrib.contenttypes.models import ContentType
 from django.urls.base import reverse
 from flexible_reports.models.table import SortIndividually, SortInGroup, Table
-from model_mommy import mommy
+from model_bakery import baker
 from test_app.models import MyTestFoo
 
 
@@ -12,7 +12,7 @@ from test_app.models import MyTestFoo
 def test_table(admin_client):
     PREFIX = "this is my prefix"
 
-    t = mommy.make(Table,
+    t = baker.bake(Table,
                    sort_option=SortInGroup.id,
                    group_prefix=PREFIX,
                    base_model=ContentType.objects.get_for_model(MyTestFoo))

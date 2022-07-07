@@ -4,7 +4,7 @@ import pytest
 from django.template.base import Template
 from django.template.context import RequestContext
 from flexible_reports.models.report import Report
-from model_mommy import mommy
+from model_bakery import baker
 from test_app.models import MyTestFoo
 
 
@@ -12,7 +12,7 @@ from test_app.models import MyTestFoo
 def test_templatetags_flexible(rf):
     x = "{% load flexible_reports_tags %}{% flexible report %}"
 
-    r = mommy.make(Report)
+    r = baker.bake(Report)
     r.set_base_queryset(MyTestFoo.objects.all())
 
     request = rf.get('/')
@@ -27,7 +27,7 @@ def test_templatetags_flexible(rf):
 def test_templatetags_render(rf):
     x = "{% load flexible_reports_tags %}{% render report %}"
 
-    r = mommy.make(Report, template="foobar")
+    r = baker.bake(Report, template="foobar")
     r.set_base_queryset(MyTestFoo.objects.all())
 
     request = rf.get('/')

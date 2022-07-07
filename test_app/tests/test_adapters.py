@@ -6,7 +6,7 @@ from django.template.context import RequestContext
 from flexible_reports.adapters import django_tables2
 from flexible_reports.models import Column, Datasource, Report, ReportElement, Table
 from flexible_reports.models.report import DATA_FROM_DATASOURCE, DATA_FROM_EXCEPT_CATCHALL
-from model_mommy import mommy
+from model_bakery import baker
 from test_app.models import MyTestBar
 
 from ..models import MyTestFoo
@@ -14,24 +14,24 @@ from ..models import MyTestFoo
 
 @pytest.mark.django_db
 def test_report(rf):
-    mommy.make(MyTestFoo, i=5)
-    mommy.make(MyTestFoo, i=5)
+    baker.bake(MyTestFoo, i=5)
+    baker.bake(MyTestFoo, i=5)
 
-    r = mommy.make(Report,
+    r = baker.bake(Report,
                    title="Report title")
 
-    t = mommy.make(Table,
+    t = baker.bake(Table,
                    label="tmp",
                    base_model=ContentType.objects.get_for_model(MyTestFoo))
 
-    mommy.make(Column,
+    baker.bake(Column,
                label="Value of i",
                parent=t,
                attr_name="i",
                position=0,
                display_totals=True)
 
-    mommy.make(Column,
+    baker.bake(Column,
                label="also value of i",
                parent=t,
                attr_name="i",
@@ -39,11 +39,11 @@ def test_report(rf):
                position=1,
                display_totals=False)
 
-    ds = mommy.make(Datasource,
+    ds = baker.bake(Datasource,
                     base_model=ContentType.objects.get_for_model(MyTestFoo),
                     dsl_query="i > 0 AND i < 10")
 
-    re = mommy.make(ReportElement,
+    re = baker.bake(ReportElement,
                     title="Report element title",
                     slug="report-element-title",
                     table=t,
@@ -74,25 +74,25 @@ def test_report(rf):
 @pytest.mark.django_db
 def test_catchall_except_catchall(rf):
     for a in range(1, 6):
-        mommy.make(MyTestFoo, i=a)
+        baker.bake(MyTestFoo, i=a)
 
     mtf = ContentType.objects.get_for_model(MyTestFoo)
 
-    r = mommy.make(Report)
-    t = mommy.make(Table, base_model=mtf)
-    mommy.make(Column, parent=t)
+    r = baker.bake(Report)
+    t = baker.bake(Table, base_model=mtf)
+    baker.bake(Column, parent=t)
 
-    ds = mommy.make(Datasource, base_model=mtf, dsl_query="i > 0 AND i < 3")
-    re = mommy.make(ReportElement, table=t, parent=r, datasource=ds,
+    ds = baker.bake(Datasource, base_model=mtf, dsl_query="i > 0 AND i < 3")
+    re = baker.bake(ReportElement, table=t, parent=r, datasource=ds,
                     data_from=DATA_FROM_DATASOURCE)
     re.clean()
 
-    ds = mommy.make(Datasource, base_model=mtf, dsl_query="i > 3")
-    re = mommy.make(ReportElement, table=t, parent=r, datasource=ds,
+    ds = baker.bake(Datasource, base_model=mtf, dsl_query="i > 3")
+    re = baker.bake(ReportElement, table=t, parent=r, datasource=ds,
                     data_from=DATA_FROM_DATASOURCE)
     re.clean()
 
-    rex = mommy.make(ReportElement,
+    rex = baker.bake(ReportElement,
                      table=t,
                      parent=r,
                      datasource=None,
@@ -110,16 +110,16 @@ def test_catchall_except_catchall(rf):
 @pytest.mark.django_db
 def test_sum_text_field(rf):
     for a in range(1, 6):
-        mommy.make(MyTestBar)
+        baker.bake(MyTestBar)
 
     mtb = ContentType.objects.get_for_model(MyTestBar)
 
-    r = mommy.make(Report)
-    t = mommy.make(Table, base_model=mtb)
-    mommy.make(Column, parent=t, display_totals=True)
+    r = baker.bake(Report)
+    t = baker.bake(Table, base_model=mtb)
+    baker.bake(Column, parent=t, display_totals=True)
 
-    ds = mommy.make(Datasource, base_model=mtb, dsl_query='i = "my test bar"')
-    mommy.make(ReportElement, table=t, parent=r, datasource=ds,
+    ds = baker.bake(Datasource, base_model=mtb, dsl_query='i = "my test bar"')
+    baker.bake(ReportElement, table=t, parent=r, datasource=ds,
                data_from=DATA_FROM_DATASOURCE,
                slug='lol')
 

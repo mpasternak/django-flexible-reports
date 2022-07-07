@@ -6,7 +6,7 @@ from flexible_reports.models.datasource import Datasource
 from flexible_reports.models.report import (
     DATA_FROM_DATASOURCE, DATA_FROM_EXCEPT_CATCHALL, Report, ReportElement, get_reports_template,
 )
-from model_mommy import mommy
+from model_bakery import baker
 from test_app.models import MyTestFoo
 
 
@@ -27,11 +27,11 @@ def test_get_reports_template():
 @pytest.mark.django_db
 def test_reportelement():
     mtf = ContentType.objects.get_for_model(Report)
-    ds = mommy.make(Datasource, base_model=mtf, dsl_query="slug = 'foo'")
+    ds = baker.bake(Datasource, base_model=mtf, dsl_query="slug = 'foo'")
 
-    r = mommy.make(Report)
+    r = baker.bake(Report)
 
-    re = mommy.make(
+    re = baker.bake(
         ReportElement,
         parent=r,
         data_from=DATA_FROM_EXCEPT_CATCHALL,
@@ -43,7 +43,7 @@ def test_reportelement():
     re.datasource = None
     re.clean()
 
-    re = mommy.make(
+    re = baker.bake(
         ReportElement,
         parent=r,
         data_from=DATA_FROM_DATASOURCE,
