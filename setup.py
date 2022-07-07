@@ -40,10 +40,16 @@ class compile_translations(Command):
 
     def run(self):
         curdir = os.getcwd()
-        os.chdir(os.path.realpath('flexible_reports'))
-        from django.core.management import call_command
-        call_command('compilemessages')
-        os.chdir(curdir)
+        try:
+            os.chdir(os.path.realpath('flexible_reports'))
+            try:
+                from django.core.management import call_command
+            except ImportError:
+                import warnings
+                warnings.warn("*** Django not importable, translations won't be build ***")
+            call_command('compilemessages')
+        finally:
+            os.chdir(curdir)
 
 
 class build(_build):
