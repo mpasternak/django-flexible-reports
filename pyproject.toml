@@ -75,6 +75,23 @@ filename = "pyproject.toml"
 search = 'version = "{current_version}"'
 replace = 'version = "{new_version}"'
 
+[tool.pytest.ini_options]
+addopts = "-s --ds=tests.settings"
+
+[tool.coverage.run]
+branch = true
+
+[tool.coverage.report]
+omit = [
+    "*site-packages*",
+    "*tests*",
+    "*.tox*",
+]
+show_missing = true
+exclude_lines = [
+    "raise NotImplementedError",
+]
+
 [tool.ruff]
 target-version = "py310"
 
