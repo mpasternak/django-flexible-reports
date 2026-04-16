@@ -1,0 +1,63 @@
+[build-system]
+requires = ["setuptools>=75.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "django-flexible-reports"
+version = "0.2.10"
+description = "A framework for report generation in Django"
+readme = "README.rst"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [{name = "Michał Pasternak", email = "michal.dtz@gmail.com"}]
+keywords = ["django-flexible-reports"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Framework :: Django",
+    "Framework :: Django :: 4.2",
+    "Framework :: Django :: 5.0",
+    "Framework :: Django :: 5.1",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+    "Django>=4.2",
+    "django-dsl>=0.1.12",
+    "django-tables2>=1.16.0",
+    "tablib>=0.11.5",
+    "lxml>=3.8.0",
+    "pypandoc>=1.4",
+    "bleach>=2.1.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "bump-my-version",
+]
+test = [
+    "coverage",
+    "pytest",
+    "pytest-django",
+    "pytest-cov",
+    "html5lib<=0.9999999",
+    "beautifulsoup4>=4.11.1",
+    "model-bakery",
+    "psycopg2-binary",
+]
+
+[project.urls]
+Homepage = "https://github.com/mpasternak/django-flexible-reports"
+
+[tool.setuptools.packages.find]
+include = ["flexible_reports*"]
+
+[tool.setuptools.package-data]
+flexible_reports = [
+    "templates/**/*",
+    "static/**/*",
+    "locale/**/*",
+]

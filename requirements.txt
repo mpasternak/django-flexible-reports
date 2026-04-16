@@ -1,6 +1,0 @@
-django-dsl>=0.1.12
-django-tables2>=1.16.0
-tablib>=0.11.5
-lxml>=3.8.0
-pypandoc>=1.4
-bleach>=2.1.1
