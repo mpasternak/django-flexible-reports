@@ -13,6 +13,36 @@ Django Flexible Reports
 
 A framework for report generation in Django
 
+Supported Versions
+------------------
+
+.. list-table::
+   :header-rows: 1
+   :stub-columns: 1
+
+   * -
+     - Python 3.10
+     - Python 3.11
+     - Python 3.12
+     - Python 3.13
+   * - Django 4.2
+     - |yes|
+     - |yes|
+     - |yes|
+     - |yes|
+   * - Django 5.0
+     - |yes|
+     - |yes|
+     - |yes|
+     - |yes|
+   * - Django 5.1
+     - |yes|
+     - |yes|
+     - |yes|
+     - |yes|
+
+.. |yes| unicode:: 0x2714
+
 Documentation
 -------------
 
