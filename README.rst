@@ -60,9 +60,8 @@ Does the code actually work?
 
 ::
 
-    source <YOURVIRTUALENV>/bin/activate
-    (myenv) $ pip install tox
-    (myenv) $ tox
+    uv sync --all-extras
+    uv run pytest
 
 Credits
 -------

@@ -45,6 +45,7 @@ nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
+.pytest_cache/
 
 # Translations
 *.mo
@@ -81,6 +82,12 @@ celerybeat-schedule
 
 # dotenv
 .env
+
+# Cryptographic files
+*.pem
+*.key
+*.p12
+*.pfx
 
 # virtualenv
 .venv
