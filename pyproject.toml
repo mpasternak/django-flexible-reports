@@ -61,3 +61,16 @@ flexible_reports = [
     "static/**/*",
     "locale/**/*",
 ]
+
+[tool.bumpversion]
+current_version = "0.2.10"
+commit = true
+tag = true
+
+[[tool.bumpversion.files]]
+filename = "flexible_reports/__init__.py"
+
+[[tool.bumpversion.files]]
+filename = "pyproject.toml"
+search = 'version = "{current_version}"'
+replace = 'version = "{new_version}"'
