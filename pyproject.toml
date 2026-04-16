@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "django-flexible-reports"
 version = "0.2.10"
 description = "A framework for report generation in Django"
-readme = "README.rst"
+readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
 authors = [{name = "Michał Pasternak", email = "michal.dtz@gmail.com"}]
