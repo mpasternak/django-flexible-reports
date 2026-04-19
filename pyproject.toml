@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "django-flexible-reports"
-version = "0.2.11"
+version = "0.2.12"
 description = "A framework for report generation in Django"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -63,7 +63,7 @@ flexible_reports = [
 ]
 
 [tool.bumpversion]
-current_version = "0.2.11"
+current_version = "0.2.12"
 commit = true
 tag = true
 

@@ -1,6 +1,5 @@
 # -*- encoding: utf-8 -*-
 import copy
-import itertools
 import sys
 from collections import OrderedDict, defaultdict
 from tempfile import NamedTemporaryFile
@@ -26,10 +25,16 @@ from flexible_reports.models.report import DATA_FROM_DATASOURCE
 
 class CounterMixin:
     def __init__(self):
-        self._counter = itertools.count(1)
+        # Kolumny są trzymane w ``Table.base_columns`` i kopiowane przez
+        # ``copy.deepcopy`` przy każdej instancjacji tabeli. Od Pythona
+        # 3.14 ``itertools.count`` traci wsparcie dla ``copy``/``deepcopy``
+        # (DeprecationWarning w 3.13, błąd w 3.14), więc licznik trzymamy
+        # jako zwykły ``int``.
+        self._counter = 0
 
     def counter(self):
-        return str(self._counter.__next__())
+        self._counter += 1
+        return str(self._counter)
 
 
 class FooterMixin:
@@ -177,7 +182,6 @@ def _report(report, parent_context):
         .select_related()
     )
     for elem in reportelements_set:
-
         if elem.data_from == DATA_FROM_DATASOURCE:
             datasource = elem.datasource
             filter = datasource.get_filter(context=report.context)
