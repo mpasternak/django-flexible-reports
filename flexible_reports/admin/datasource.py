@@ -2,7 +2,6 @@
 
 from django import forms
 from django.contrib import admin
-from django.core.exceptions import ValidationError
 from django.utils.safestring import mark_safe
 
 try:
@@ -10,57 +9,25 @@ try:
 except ImportError:
     from django.utils.translation import ugettext_lazy as _
 
-from django_dsl import compiler, exceptions
-
-from flexible_reports.admin.helpers import BiggerTextarea
-
-from .. import utils
 from ..models.datasource import Datasource
-from .helpers import SmallerTextarea
+from .helpers import BiggerTextarea, SmallerTextarea
 
 
 class DatasourceForm(forms.ModelForm):
-    def clean(self):
-        if "base_model" not in self.cleaned_data:
-            return
-
-        model = self.cleaned_data["base_model"].model_class()
-        shortcuts = utils.get_shortcuts(model)
-
-        try:
-            filter = compiler.compile(self.cleaned_data["dsl_query"], shortcuts)
-        except exceptions.CompileException:
-            return  # handled by dsl_query.validators
-
-        try:
-            model.objects.filter(filter).first()
-        except Exception as e:
-            raise ValidationError(
-                {
-                    "dsl_query": [
-                        ValidationError(
-                            _(
-                                "An error occured while trying to run the actual "
-                                "database query (%(error)s)"
-                            ),
-                            params={"error": e},
-                        )
-                    ]
-                }
-            )
-
+    # Validation lives on Datasource.clean(), which dispatches to the query
+    # backend selected by ``query_language``; the ModelForm runs it for us.
     class Meta:
         model = Datasource
-        fields = ["label", "base_model", "dsl_query", "distinct"]
+        fields = ["label", "base_model", "query_language", "dsl_query", "distinct"]
         widgets = {"label": SmallerTextarea, "dsl_query": BiggerTextarea}
 
 
 @admin.register(Datasource)
 class DatasourceAdmin(admin.ModelAdmin):
-    list_display = ["label", "base_model", "dsl_query_fmt"]
+    list_display = ["label", "base_model", "query_language", "dsl_query_fmt"]
     form = DatasourceForm
 
     def dsl_query_fmt(self, obj):
-        return mark_safe(f"<pre>{ obj.dsl_query }</pre>")
+        return mark_safe(f"<pre>{obj.dsl_query}</pre>")
 
-    dsl_query_fmt.short_description = _("DSL query")
+    dsl_query_fmt.short_description = _("Query")
