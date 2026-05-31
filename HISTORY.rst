@@ -3,6 +3,17 @@
 History
 -------
 
+0.3.0 (unreleased)
+++++++++++++++++++
+
+* ``Datasource`` gained a ``query_language`` field and can now interpret its
+  query with either ``django-dsl`` (default) or `DjangoQL`_. Query backends are
+  pluggable (``flexible_reports.query_backends``). The django_tables2 adapter
+  now consumes a filtered queryset from each datasource instead of a raw ``Q``
+  object. Existing datasources keep working unchanged (default ``dsl``).
+
+.. _DjangoQL: https://github.com/ivelum/djangoql
+
 0.2.12 (2026-04-19)
 +++++++++++++++++++
 
