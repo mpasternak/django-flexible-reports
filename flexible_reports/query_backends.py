@@ -76,7 +76,7 @@ class DSLQueryBackend:
                         )
                     ]
                 }
-            )
+            ) from e
         try:
             model.objects.filter(compiled).first()
         except Exception as e:
@@ -92,7 +92,7 @@ class DSLQueryBackend:
                         )
                     ]
                 }
-            )
+            ) from e
 
 
 class DjangoQLQueryBackend:
@@ -137,7 +137,7 @@ class DjangoQLQueryBackend:
                         )
                     ]
                 }
-            )
+            ) from e
         except Exception as e:
             raise ValidationError(
                 {
@@ -151,7 +151,7 @@ class DjangoQLQueryBackend:
                         )
                     ]
                 }
-            )
+            ) from e
 
 
 BACKENDS = {
