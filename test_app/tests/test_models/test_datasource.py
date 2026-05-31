@@ -69,3 +69,29 @@ def test_datasource_clean_djangoql_unknown_field_raises():
     )
     with pytest.raises(ValidationError):
         d.clean()
+
+
+@pytest.mark.django_db
+def test_datasource_clean_dsl_ok():
+    d = Datasource(
+        base_model=ContentType.objects.get_for_model(MyTestFoo),
+        query_language="dsl",
+        dsl_query="i = 5",
+    )
+    d.clean()  # must not raise
+
+
+@pytest.mark.django_db
+def test_datasource_clean_dsl_unknown_field_raises():
+    d = Datasource(
+        base_model=ContentType.objects.get_for_model(MyTestFoo),
+        query_language="dsl",
+        dsl_query="nope > 1",
+    )
+    with pytest.raises(ValidationError):
+        d.clean()
+
+
+def test_datasource_clean_without_base_model_is_noop():
+    # base_model is unset -> clean() returns early without touching the DB.
+    Datasource(dsl_query="anything").clean()  # must not raise

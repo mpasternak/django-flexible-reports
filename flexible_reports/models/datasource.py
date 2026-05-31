@@ -6,6 +6,7 @@ try:
 except ImportError:
     from django.utils.translation import ugettext_lazy as _
 
+from .. import utils
 from ..query_backends import DSL, QUERY_LANGUAGE_CHOICES, get_backend
 from .behaviors import Labelled, WithBaseModel
 
@@ -42,7 +43,7 @@ class Datasource(Labelled, WithBaseModel):
         return self.base_model.model_class()
 
     def get_shortcuts(self):
-        return getattr(self.get_model(), "django_dsl_shortcuts", {})
+        return utils.get_shortcuts(self.get_model())
 
     def get_backend(self):
         return get_backend(self.query_language)
