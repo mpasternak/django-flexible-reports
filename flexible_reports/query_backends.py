@@ -57,6 +57,11 @@ class DSLQueryBackend:
         )
 
     def validate(self, query, model):
+        """Validate ``query`` against ``model``.
+
+        Raises ``ValidationError`` on a compilation error or when a trial
+        database query fails.
+        """
         from django_dsl import compiler, exceptions
 
         _check_not_empty(query)
@@ -111,6 +116,11 @@ class DjangoQLQueryBackend:
         return apply_search(base_queryset, self._render(query, context))
 
     def validate(self, query, model):
+        """Validate ``query`` against ``model``.
+
+        Raises ``ValidationError`` on a parser/schema error (e.g. unknown
+        field) or when a trial database query fails.
+        """
         from djangoql.exceptions import DjangoQLError
         from djangoql.queryset import apply_search
 
@@ -152,4 +162,9 @@ BACKENDS = {
 
 
 def get_backend(name):
-    return BACKENDS[name]
+    try:
+        return BACKENDS[name]
+    except KeyError:
+        raise KeyError(
+            "Unknown query backend %r. Available: %s" % (name, sorted(BACKENDS))
+        )

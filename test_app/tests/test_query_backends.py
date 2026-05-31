@@ -61,3 +61,18 @@ def test_djangoql_get_filter_not_supported():
 def test_get_backend_returns_expected_types():
     assert isinstance(get_backend("dsl"), DSLQueryBackend)
     assert isinstance(get_backend("djangoql"), DjangoQLQueryBackend)
+
+
+def test_dsl_validate_empty_raises():
+    with pytest.raises(ValidationError):
+        DSLQueryBackend().validate("   ", MyTestFoo)
+
+
+@pytest.mark.django_db
+def test_dsl_filter_queryset_uses_template_context():
+    MyTestFoo.objects.create(i=5)
+    MyTestFoo.objects.create(i=7)
+    qs = DSLQueryBackend().filter_queryset(
+        MyTestFoo.objects.all(), "i = {{ value }}", context={"value": 7}
+    )
+    assert sorted(o.i for o in qs) == [7]
