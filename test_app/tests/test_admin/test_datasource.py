@@ -1,9 +1,20 @@
 # -*- encoding: utf-8 -*-
 import pytest
+from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 
-from flexible_reports.admin.datasource import DatasourceForm
+from flexible_reports.admin.datasource import DatasourceAdmin, DatasourceForm
+from flexible_reports.models.datasource import Datasource
 from test_app.models import MyTestFoo
+
+
+def test_dsl_query_fmt_escapes_html():
+    # The query is admin-authored free text; it must be escaped, not marked
+    # safe, when shown in the changelist (stored XSS otherwise).
+    obj = Datasource(dsl_query="<script>alert(1)</script>")
+    html = DatasourceAdmin(Datasource, admin.site).dsl_query_fmt(obj)
+    assert "<script>" not in html
+    assert "&lt;script&gt;" in html
 
 
 def _data(**over):
