@@ -3,7 +3,7 @@
 History
 -------
 
-0.3.0 (unreleased)
+0.3.0 (2026-05-31)
 ++++++++++++++++++
 
 * ``Datasource`` gained a ``query_language`` field and can now interpret its
