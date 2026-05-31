@@ -47,3 +47,22 @@ def test_datasource_form_invalid_djangoql_unknown_field():
     form = DatasourceForm(data=_data(query_language="djangoql", dsl_query="nope = 1"))
     assert not form.is_valid()
     assert "dsl_query" in form.errors
+
+
+@pytest.mark.django_db
+def test_query_language_dispatch_dsl_rejects_lowercase_or():
+    # django-dsl requires uppercase OR; lowercase 'or' is a compile error.
+    # Proves the DSL backend is selected when query_language='dsl'.
+    form = DatasourceForm(data=_data(query_language="dsl", dsl_query="i = 5 or i = 6"))
+    assert not form.is_valid()
+    assert "dsl_query" in form.errors
+
+
+@pytest.mark.django_db
+def test_query_language_dispatch_djangoql_accepts_lowercase_or():
+    # DjangoQL accepts lowercase 'or'. Proves the DjangoQL backend is selected
+    # when query_language='djangoql' (the same query is rejected by DSL above).
+    form = DatasourceForm(
+        data=_data(query_language="djangoql", dsl_query="i = 5 or i = 6")
+    )
+    assert form.is_valid(), form.errors
