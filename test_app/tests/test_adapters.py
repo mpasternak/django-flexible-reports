@@ -192,3 +192,52 @@ def test_catchall_except_catchall_djangoql(rf):
     res = django_tables2._report(r, {"request": None})
     assert res["except_catchall"]["test_app_mytestfoo"].count() == 1
     assert res["except_catchall"]["test_app_mytestfoo"][0].i == 3
+
+
+@pytest.mark.django_db
+def test_except_catchall_rendered_into_element_object_list(rf):
+    # Regression: the except-catchall element must receive the filtered
+    # queryset in render_context["elements"][slug]["object_list"]. The lookup
+    # key has to be built from ContentType.model (e.g. "mytestfoo"), which
+    # differs from ContentType.name ("my test foo") whenever a model's
+    # verbose_name is not identical to its model name -- otherwise the lookup
+    # misses and the rendered table is silently empty.
+    for a in range(1, 6):
+        baker.make(MyTestFoo, i=a)
+
+    mtf = ContentType.objects.get_for_model(MyTestFoo)
+
+    r = baker.make(Report)
+    t = baker.make(Table, base_model=mtf)
+    baker.make(Column, parent=t)
+
+    ds = baker.make(
+        Datasource, base_model=mtf, query_language="djangoql", dsl_query="i < 3"
+    )
+    baker.make(
+        ReportElement, table=t, parent=r, datasource=ds, data_from=DATA_FROM_DATASOURCE
+    )
+
+    ds = baker.make(
+        Datasource, base_model=mtf, query_language="djangoql", dsl_query="i > 3"
+    )
+    baker.make(
+        ReportElement, table=t, parent=r, datasource=ds, data_from=DATA_FROM_DATASOURCE
+    )
+
+    ec_elem = baker.make(
+        ReportElement,
+        table=t,
+        parent=r,
+        datasource=None,
+        base_model=mtf,
+        data_from=DATA_FROM_EXCEPT_CATCHALL,
+    )
+
+    r.set_base_queryset(MyTestFoo.objects.all())
+
+    res = django_tables2._report(r, {"request": None})
+
+    object_list = res["elements"][ec_elem.slug]["object_list"]
+    assert object_list.count() == 1
+    assert object_list[0].i == 3

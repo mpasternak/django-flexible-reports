@@ -1,7 +1,9 @@
 # -*- encoding: utf-8 -*-
 import copy
+import operator
 import sys
 from collections import OrderedDict, defaultdict
+from functools import reduce
 from tempfile import NamedTemporaryFile
 
 import bleach
@@ -214,20 +216,21 @@ def _report(report, parent_context):
         render_context["elements"][elem.slug] = table_dict
 
     # Fill except-catchall.
-    # ``catchall`` now holds the already-filtered querysets produced by each
-    # datasource (instead of raw Q objects), so we exclude their primary keys
-    # one queryset at a time. Excluding A then B is equivalent to excluding
-    # A | B, which matches the previous OR-of-Q behaviour for a single model
-    # and is well-defined when several models are involved.
+    # ``catchall`` holds the already-filtered querysets produced by each
+    # datasource (instead of raw Q objects). All querysets under one key filter
+    # the same ``report.base_queryset``, so we OR them into a single queryset
+    # and exclude its primary keys in one go -- equivalent to the previous
+    # OR-of-Q behaviour, but with one subquery per model instead of one per
+    # datasource.
     except_catchall = report.base_queryset.all()
     for key, querysets in render_context["catchall"].items():
         if not querysets:
             continue
 
-        for object_list in querysets:
-            except_catchall = except_catchall.exclude(
-                pk__in=object_list.values_list("pk", flat=True)
-            )
+        caught = reduce(operator.or_, querysets)
+        except_catchall = except_catchall.exclude(
+            pk__in=caught.values_list("pk", flat=True)
+        )
 
         render_context["except_catchall"][key] = except_catchall
 
@@ -237,7 +240,11 @@ def _report(report, parent_context):
 
         base_model = elem["except_catchall"]
 
-        key = "%s_%s" % (base_model.app_label, base_model.name)
+        # Match the key built when filling ``except_catchall`` above, which uses
+        # ContentType.model. ContentType.name (the verbose name) differs from
+        # the model name for most models, so using it here misses the lookup
+        # and renders an empty table.
+        key = "%s_%s" % (base_model.app_label, base_model.model)
 
         object_list = render_context["except_catchall"][key]
         elem["object_list"] = object_list

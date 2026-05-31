@@ -2,7 +2,7 @@
 
 from django import forms
 from django.contrib import admin
-from django.utils.safestring import mark_safe
+from django.utils.html import format_html
 
 try:
     from django.utils.translation import gettext_lazy as _
@@ -18,7 +18,14 @@ class DatasourceForm(forms.ModelForm):
     # backend selected by ``query_language``; the ModelForm runs it for us.
     class Meta:
         model = Datasource
-        fields = ["label", "base_model", "query_language", "dsl_query", "distinct"]
+        fields = [
+            "label",
+            "base_model",
+            "query_language",
+            "dsl_query",
+            "sample_context",
+            "distinct",
+        ]
         widgets = {"label": SmallerTextarea, "dsl_query": BiggerTextarea}
 
 
@@ -28,6 +35,6 @@ class DatasourceAdmin(admin.ModelAdmin):
     form = DatasourceForm
 
     def dsl_query_fmt(self, obj):
-        return mark_safe(f"<pre>{obj.dsl_query}</pre>")
+        return format_html("<pre>{}</pre>", obj.dsl_query)
 
     dsl_query_fmt.short_description = _("Query")

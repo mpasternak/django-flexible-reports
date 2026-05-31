@@ -76,3 +76,25 @@ def test_dsl_filter_queryset_uses_template_context():
         MyTestFoo.objects.all(), "i = {{ value }}", context={"value": 7}
     )
     assert sorted(o.i for o in qs) == [7]
+
+
+@pytest.mark.django_db
+def test_djangoql_validate_parametrized_with_context_ok():
+    DjangoQLQueryBackend().validate("i = {{ value }}", MyTestFoo, context={"value": 5})
+
+
+@pytest.mark.django_db
+def test_djangoql_validate_parametrized_without_context_raises():
+    with pytest.raises(ValidationError):
+        DjangoQLQueryBackend().validate("i = {{ value }}", MyTestFoo)
+
+
+@pytest.mark.django_db
+def test_dsl_validate_parametrized_with_context_ok():
+    DSLQueryBackend().validate("i = {{ value }}", MyTestFoo, context={"value": 5})
+
+
+@pytest.mark.django_db
+def test_dsl_validate_parametrized_without_context_raises():
+    with pytest.raises(ValidationError):
+        DSLQueryBackend().validate("i = {{ value }}", MyTestFoo)
