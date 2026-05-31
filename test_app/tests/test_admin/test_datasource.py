@@ -1,27 +1,49 @@
 # -*- encoding: utf-8 -*-
 import pytest
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ValidationError
+
 from flexible_reports.admin.datasource import DatasourceForm
 from test_app.models import MyTestFoo
 
 
+def _data(**over):
+    data = {
+        "label": "ds",
+        "base_model": ContentType.objects.get_for_model(MyTestFoo).pk,
+        "query_language": "dsl",
+        "dsl_query": "i = 5",
+        "distinct": True,
+    }
+    data.update(over)
+    return data
+
+
 @pytest.mark.django_db
-def test_datasource_form():
-    d = DatasourceForm()
+def test_datasource_form_has_query_language():
+    assert "query_language" in DatasourceForm().fields
 
-    d.cleaned_data = {}
-    assert d.clean() is None
 
-    d.cleaned_data = {
-        'base_model': ContentType.objects.get_for_model(MyTestFoo),
-        'dsl_query': "134ads"
-    }
-    assert d.clean() is None
+@pytest.mark.django_db
+def test_datasource_form_valid_dsl():
+    form = DatasourceForm(data=_data())
+    assert form.is_valid(), form.errors
 
-    d.cleaned_data = {
-        'base_model': ContentType.objects.get_for_model(MyTestFoo),
-        'dsl_query': "x>100"
-    }
-    with pytest.raises(ValidationError):
-        d.clean()
+
+@pytest.mark.django_db
+def test_datasource_form_invalid_dsl_db_error():
+    form = DatasourceForm(data=_data(dsl_query="x > 100"))
+    assert not form.is_valid()
+    assert "dsl_query" in form.errors
+
+
+@pytest.mark.django_db
+def test_datasource_form_valid_djangoql():
+    form = DatasourceForm(data=_data(query_language="djangoql", dsl_query="i = 5"))
+    assert form.is_valid(), form.errors
+
+
+@pytest.mark.django_db
+def test_datasource_form_invalid_djangoql_unknown_field():
+    form = DatasourceForm(data=_data(query_language="djangoql", dsl_query="nope = 1"))
+    assert not form.is_valid()
+    assert "dsl_query" in form.errors
