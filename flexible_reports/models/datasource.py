@@ -6,23 +6,26 @@ try:
 except ImportError:
     from django.utils.translation import ugettext_lazy as _
 
-from django_dsl import compiler
-from django_dsl.fields import DjangoDSLField
-
+from ..query_backends import DSL, QUERY_LANGUAGE_CHOICES, get_backend
 from .behaviors import Labelled, WithBaseModel
 
 
 class Datasource(Labelled, WithBaseModel):
     """Datasource gets data from the database.
 
-    It uses self.base_model.objects.all(), unless there's something in
-    dsl_query field.
-
-    If there is, it compiles that DSL and uses
-    self.base_model.objects.filter().
+    It narrows ``self.base_model.objects.all()`` using the query stored in
+    ``dsl_query``, interpreted according to ``query_language`` (django-dsl or
+    DjangoQL).
     """
 
-    dsl_query = DjangoDSLField(verbose_name=_("DSL query"))
+    query_language = models.CharField(
+        max_length=16,
+        choices=QUERY_LANGUAGE_CHOICES,
+        default=DSL,
+        verbose_name=_("Query language"),
+    )
+
+    dsl_query = models.TextField(verbose_name=_("Query"))
 
     distinct = models.BooleanField(
         default=True,
@@ -41,7 +44,24 @@ class Datasource(Labelled, WithBaseModel):
     def get_shortcuts(self):
         return getattr(self.get_model(), "django_dsl_shortcuts", {})
 
+    def get_backend(self):
+        return get_backend(self.query_language)
+
     def get_filter(self, context=None):
-        return compiler.compile(
-            self.dsl_query, shortcuts=self.get_shortcuts(), context=context
+        """Return a ``Q`` object for the query.
+
+        Only the django-dsl backend can produce a ``Q``; the DjangoQL backend
+        raises ``NotImplementedError`` (use :meth:`filter_queryset` instead).
+        """
+        return self.get_backend().get_filter(self.dsl_query, self.get_model(), context)
+
+    def filter_queryset(self, base_queryset, context=None):
+        """Return ``base_queryset`` narrowed by this datasource's query."""
+        return self.get_backend().filter_queryset(
+            base_queryset, self.dsl_query, context
         )
+
+    def clean(self):
+        if self.base_model_id is None:
+            return
+        self.get_backend().validate(self.dsl_query, self.get_model())
