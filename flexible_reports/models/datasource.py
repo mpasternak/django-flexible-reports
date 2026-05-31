@@ -28,6 +28,16 @@ class Datasource(Labelled, WithBaseModel):
 
     dsl_query = models.TextField(verbose_name=_("Query"))
 
+    sample_context = models.JSONField(
+        default=dict,
+        blank=True,
+        verbose_name=_("Sample parameters"),
+        help_text=_(
+            "Example values for template parameters in the query "
+            '(e.g. {"value": 7}). Used only to validate the query on save.'
+        ),
+    )
+
     distinct = models.BooleanField(
         default=True,
         verbose_name=_("Distinct"),
@@ -65,4 +75,6 @@ class Datasource(Labelled, WithBaseModel):
     def clean(self):
         if self.base_model_id is None:
             return
-        self.get_backend().validate(self.dsl_query, self.get_model())
+        self.get_backend().validate(
+            self.dsl_query, self.get_model(), context=self.sample_context
+        )

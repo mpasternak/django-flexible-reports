@@ -18,7 +18,14 @@ class DatasourceForm(forms.ModelForm):
     # backend selected by ``query_language``; the ModelForm runs it for us.
     class Meta:
         model = Datasource
-        fields = ["label", "base_model", "query_language", "dsl_query", "distinct"]
+        fields = [
+            "label",
+            "base_model",
+            "query_language",
+            "dsl_query",
+            "sample_context",
+            "distinct",
+        ]
         widgets = {"label": SmallerTextarea, "dsl_query": BiggerTextarea}
 
 

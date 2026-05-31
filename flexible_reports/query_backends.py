@@ -55,17 +55,21 @@ class DSLQueryBackend:
             self.get_filter(query, base_queryset.model, context)
         )
 
-    def validate(self, query, model):
+    def validate(self, query, model, context=None):
         """Validate ``query`` against ``model``.
 
-        Raises ``ValidationError`` on a compilation error or when a trial
-        database query fails.
+        ``context`` supplies example values for any template parameters in the
+        query, so a parametrised query can be validated against realistic
+        values. Raises ``ValidationError`` on a compilation error or when a
+        trial database query fails.
         """
         from django_dsl import compiler, exceptions
 
         _check_not_empty(query)
         try:
-            compiled = compiler.compile(query, shortcuts=utils.get_shortcuts(model))
+            compiled = compiler.compile(
+                query, shortcuts=utils.get_shortcuts(model), context=context or {}
+            )
         except exceptions.CompileException as e:
             raise ValidationError(
                 {
@@ -114,17 +118,19 @@ class DjangoQLQueryBackend:
 
         return apply_search(base_queryset, self._render(query, context))
 
-    def validate(self, query, model):
+    def validate(self, query, model, context=None):
         """Validate ``query`` against ``model``.
 
-        Raises ``ValidationError`` on a parser/schema error (e.g. unknown
-        field) or when a trial database query fails.
+        ``context`` supplies example values for any template parameters in the
+        query, so a parametrised query can be validated against realistic
+        values. Raises ``ValidationError`` on a parser/schema error (e.g.
+        unknown field) or when a trial database query fails.
         """
         from djangoql.exceptions import DjangoQLError
         from djangoql.queryset import apply_search
 
         _check_not_empty(query)
-        rendered = self._render(query, {})
+        rendered = self._render(query, context)
         try:
             apply_search(model.objects.all(), rendered).first()
         except DjangoQLError as e:
