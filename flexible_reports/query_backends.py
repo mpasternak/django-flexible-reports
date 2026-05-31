@@ -12,8 +12,7 @@ parametrise queries with values from the report context.
 """
 
 from django.core.exceptions import ValidationError
-from django.template import Context
-from django.template.base import Template
+from django.template import Context, Template
 
 try:
     from django.utils.translation import gettext_lazy as _
@@ -165,6 +164,6 @@ def get_backend(name):
     try:
         return BACKENDS[name]
     except KeyError:
-        raise KeyError(
+        raise ValueError(
             "Unknown query backend %r. Available: %s" % (name, sorted(BACKENDS))
-        )
+        ) from None
