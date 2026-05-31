@@ -105,7 +105,10 @@ class DjangoQLQueryBackend:
     name = DJANGOQL
 
     def _render(self, query, context):
-        return Template(query).render(Context(context or {}))
+        # autoescape=False: parameter values feed a query language, not HTML.
+        # Escaping would turn query-significant characters (``<``, ``&``, ``"``)
+        # into entities and corrupt the query.
+        return Template(query).render(Context(context or {}, autoescape=False))
 
     def get_filter(self, query, model, context=None):
         raise NotImplementedError(

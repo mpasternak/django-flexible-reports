@@ -77,3 +77,15 @@ def test_query_language_dispatch_djangoql_accepts_lowercase_or():
         data=_data(query_language="djangoql", dsl_query="i = 5 or i = 6")
     )
     assert form.is_valid(), form.errors
+
+
+@pytest.mark.django_db
+def test_datasource_form_blank_sample_context_saves():
+    # Regression: clearing "Sample parameters" in the admin submits an empty
+    # value, which forms.JSONField turns into None. With the field declared
+    # null=False that saved NULL into a NOT NULL column -> IntegrityError (a
+    # 500 in the admin). An empty submission must save cleanly.
+    form = DatasourceForm(data=_data(sample_context=""))
+    assert form.is_valid(), form.errors
+    obj = form.save()
+    assert obj.pk is not None
