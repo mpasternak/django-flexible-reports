@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+from django.core.exceptions import ValidationError
 from django.db import models
 
 try:
@@ -31,6 +32,7 @@ class Datasource(Labelled, WithBaseModel):
     sample_context = models.JSONField(
         default=dict,
         blank=True,
+        null=True,
         verbose_name=_("Sample parameters"),
         help_text=_(
             "Example values for template parameters in the query "
@@ -75,6 +77,21 @@ class Datasource(Labelled, WithBaseModel):
     def clean(self):
         if self.base_model_id is None:
             return
+        if self.sample_context is not None and not isinstance(
+            self.sample_context, dict
+        ):
+            raise ValidationError(
+                {
+                    "sample_context": [
+                        ValidationError(
+                            _(
+                                "Sample parameters must be a JSON object "
+                                '(e.g. {"value": 7}).'
+                            )
+                        )
+                    ]
+                }
+            )
         self.get_backend().validate(
             self.dsl_query, self.get_model(), context=self.sample_context
         )

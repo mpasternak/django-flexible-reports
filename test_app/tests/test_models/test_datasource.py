@@ -129,3 +129,32 @@ def test_datasource_clean_dsl_parametrized_with_sample_context_ok():
         sample_context={"value": 5},
     )
     d.clean()  # must not raise
+
+
+@pytest.mark.django_db
+def test_datasource_clean_non_dict_sample_context_raises():
+    # sample_context is a JSONField, so it can legitimately hold a list/string/
+    # number. Only a JSON object is meaningful as a template context; anything
+    # else must be rejected with a clear error instead of silently rendering
+    # every parameter as empty.
+    d = Datasource(
+        base_model=ContentType.objects.get_for_model(MyTestFoo),
+        query_language="djangoql",
+        dsl_query="i = 5",
+        sample_context=[1, 2, 3],
+    )
+    with pytest.raises(ValidationError):
+        d.clean()
+
+
+@pytest.mark.django_db
+def test_datasource_clean_none_sample_context_ok():
+    # An empty admin submission stores None (see the form regression test);
+    # clean() must treat it as "no parameters", not reject it.
+    d = Datasource(
+        base_model=ContentType.objects.get_for_model(MyTestFoo),
+        query_language="djangoql",
+        dsl_query="i = 5",
+        sample_context=None,
+    )
+    d.clean()  # must not raise
