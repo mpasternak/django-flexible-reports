@@ -3,6 +3,25 @@
 History
 -------
 
+0.3.1 (2026-05-31)
+++++++++++++++++++
+
+* ``Datasource`` gained an optional ``sample_context`` field holding example
+  values for a query's template parameters, used to validate a parametrised
+  query on save (both ``dsl`` and ``DjangoQL`` backends). It is nullable and
+  must be a JSON object.
+* Fix an admin 500 when clearing *Sample parameters* — the ``sample_context``
+  JSONField is now nullable.
+* Don't HTML-escape query parameters when rendering ``DjangoQL`` queries, so
+  values containing ``<``, ``&`` or ``"`` are no longer corrupted. The
+  ``django-dsl`` backend received the same fix in django-dsl 0.1.14.
+* Fix the except-catchall element lookup (key off ``ContentType.model``) so the
+  "everything except" table renders its rows instead of being silently empty;
+  the caught querysets are OR-ed into a single exclude.
+* Escape the datasource query shown in the admin changelist.
+* Chain ``ValidationError`` from the original backend error for clearer
+  diagnostics.
+
 0.3.0 (2026-05-31)
 ++++++++++++++++++
 
