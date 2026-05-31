@@ -70,7 +70,7 @@ def test_report(rf):
 
     assert res is not None
 
-    bs = BeautifulSoup(res, "html.parser") # html5lib") # lxml")
+    bs = BeautifulSoup(res, "html.parser")  # html5lib") # lxml")
     assert len(bs.table.tbody.find_all("td")) == 4
     assert bs.table.tfoot.td.text == "10"
 
@@ -151,3 +151,44 @@ def test_sum_text_field(rf):
     assert lol["table"].columns[0].has_footer()
 
     assert lol["table"].columns[0].footer == "5"
+
+
+@pytest.mark.django_db
+def test_catchall_except_catchall_djangoql(rf):
+    for a in range(1, 6):
+        baker.make(MyTestFoo, i=a)
+
+    mtf = ContentType.objects.get_for_model(MyTestFoo)
+
+    r = baker.make(Report)
+    t = baker.make(Table, base_model=mtf)
+    baker.make(Column, parent=t)
+
+    ds = baker.make(
+        Datasource, base_model=mtf, query_language="djangoql", dsl_query="i < 3"
+    )
+    baker.make(
+        ReportElement, table=t, parent=r, datasource=ds, data_from=DATA_FROM_DATASOURCE
+    )
+
+    ds = baker.make(
+        Datasource, base_model=mtf, query_language="djangoql", dsl_query="i > 3"
+    )
+    baker.make(
+        ReportElement, table=t, parent=r, datasource=ds, data_from=DATA_FROM_DATASOURCE
+    )
+
+    baker.make(
+        ReportElement,
+        table=t,
+        parent=r,
+        datasource=None,
+        base_model=mtf,
+        data_from=DATA_FROM_EXCEPT_CATCHALL,
+    )
+
+    r.set_base_queryset(MyTestFoo.objects.all())
+
+    res = django_tables2._report(r, {"request": None})
+    assert res["except_catchall"]["test_app_mytestfoo"].count() == 1
+    assert res["except_catchall"]["test_app_mytestfoo"][0].i == 3

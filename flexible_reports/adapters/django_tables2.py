@@ -184,15 +184,16 @@ def _report(report, parent_context):
     for elem in reportelements_set:
         if elem.data_from == DATA_FROM_DATASOURCE:
             datasource = elem.datasource
-            filter = datasource.get_filter(context=report.context)
-            object_list = report.base_queryset.filter(filter)
+            object_list = datasource.filter_queryset(
+                report.base_queryset, context=report.context
+            )
 
             ds_key = "%s_%s" % (
                 datasource.base_model.app_label,
                 datasource.base_model.model,
             )
 
-            render_context["catchall"][ds_key].append(filter)
+            render_context["catchall"][ds_key].append(object_list)
 
             if datasource.distinct:
                 object_list = object_list.distinct()
@@ -212,21 +213,21 @@ def _report(report, parent_context):
 
         render_context["elements"][elem.slug] = table_dict
 
-    # Fill except-catchall
+    # Fill except-catchall.
+    # ``catchall`` now holds the already-filtered querysets produced by each
+    # datasource (instead of raw Q objects), so we exclude their primary keys
+    # one queryset at a time. Excluding A then B is equivalent to excluding
+    # A | B, which matches the previous OR-of-Q behaviour for a single model
+    # and is well-defined when several models are involved.
     except_catchall = report.base_queryset.all()
-    q = None
-    for key, filters in render_context["catchall"].items():
-        if not filters:
+    for key, querysets in render_context["catchall"].items():
+        if not querysets:
             continue
 
-        if q is None:
-            q = filters[0]
-        for filter in filters[1:]:
-            q |= filter
-
-        except_catchall = except_catchall.exclude(
-            pk__in=report.base_queryset.filter(q).values_list("pk", flat=True)
-        )
+        for object_list in querysets:
+            except_catchall = except_catchall.exclude(
+                pk__in=object_list.values_list("pk", flat=True)
+            )
 
         render_context["except_catchall"][key] = except_catchall
 
