@@ -98,3 +98,11 @@ def test_dsl_validate_parametrized_with_context_ok():
 def test_dsl_validate_parametrized_without_context_raises():
     with pytest.raises(ValidationError):
         DSLQueryBackend().validate("i = {{ value }}", MyTestFoo)
+
+
+def test_djangoql_render_does_not_html_escape_context_values():
+    # A parametrised value with query-significant characters (&, <, ", ') must
+    # be substituted verbatim. HTML autoescaping would turn `<` into `&lt;`,
+    # `&` into `&amp;` etc. and corrupt the rendered query.
+    rendered = DjangoQLQueryBackend()._render('name = "{{ q }}"', {"q": "A & B"})
+    assert rendered == 'name = "A & B"'
