@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "django-flexible-reports"
-version = "0.3.1"
+version = "0.3.2"
 description = "A framework for report generation in Django"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -27,7 +27,7 @@ classifiers = [
 dependencies = [
     "Django>=4.2",
     "django-dsl>=0.1.12",
-    "djangoql>=0.18",
+    "djangoql-iplweb>=0.20",
     "django-tables2>=1.16.0",
     "tablib>=0.11.5",
     "lxml>=3.8.0",
@@ -64,7 +64,7 @@ flexible_reports = [
 ]
 
 [tool.bumpversion]
-current_version = "0.3.1"
+current_version = "0.3.2"
 commit = true
 tag = true
 

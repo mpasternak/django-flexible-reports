@@ -3,6 +3,14 @@
 History
 -------
 
+0.3.2 (2026-06-03)
+++++++++++++++++++
+
+* Switch the DjangoQL dependency from upstream ``djangoql`` to the
+  ``djangoql-iplweb`` fork (``>=0.20``). The fork keeps the ``djangoql`` import
+  name unchanged, so no code changes are required, and it adds i18n support for
+  parser/lexer/schema error messages (including a Polish translation).
+
 0.3.1 (2026-05-31)
 ++++++++++++++++++
 
