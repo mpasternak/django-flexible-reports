@@ -11,6 +11,7 @@ except ImportError:
 from flexible_reports.models.table import AllSortOptions, SortInGroup
 
 from ..models import Column, ColumnOrder, Table
+from .cloning import CloneAdminMixin
 from .helpers import AverageTextarea, SmallerTextarea, SortableHiddenMixin
 
 
@@ -86,7 +87,7 @@ class TableForm(forms.ModelForm):
 
 
 @admin.register(Table)
-class TableAdmin(admin.ModelAdmin):
+class TableAdmin(CloneAdminMixin, admin.ModelAdmin):
     list_display = ["label", "base_model", "short_sort_option", "columns"]
     inlines = [ColumnInline, ColumnOrderInline]
     form = TableForm

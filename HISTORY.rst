@@ -3,6 +3,32 @@
 History
 -------
 
+0.4.0 (unreleased)
+++++++++++++++++++
+
+* ``Table`` and ``Report`` can now be cloned from the admin, using a *Clone*
+  button on the change form. Cloning a table copies its columns and its sort
+  order; cloning a report copies its elements, which keep pointing at the same
+  tables and datasources. The clone's name gets a translatable ``(copy)``
+  suffix.
+
+  Both are also available programmatically as ``Table.clone()`` and
+  ``Report.clone()``. Neither modifies the source object.
+
+  Note: the button has not been verified against `grappelli`, which ships its
+  own ``admin/change_form.html``.
+
+* Fix stale table headers. A cached table class was kept per ``Table.pk`` for
+  the lifetime of the process and never invalidated, so editing a column's
+  label -- or deleting a column -- only became visible after restarting
+  Django. With several workers the page alternated between old and new
+  headers depending on which worker answered.
+
+  The cache is gone. Compiled column templates are cached instead, keyed by
+  the template source so no invalidation is needed, which more than pays the
+  removal back: rendering a 500-row table is ~1.25x faster than before, since
+  ``TemplateColumn`` used to recompile its template for every single cell.
+
 0.3.2 (2026-06-03)
 ++++++++++++++++++
 
