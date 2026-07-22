@@ -5,6 +5,13 @@
 * **Backwards incompatible:** the minimum supported Django is now 5.2 LTS.
   Tested against Django 5.2 and 6.0.
 
+* The Polish translation now actually works when installed from PyPI. Django
+  reads compiled `.mo` catalogues rather than the `.po` sources, and `*.mo` is
+  gitignored, so every release up to and including 0.3.2 shipped the `.po`
+  alone and the translation silently did nothing. Releases now compile the
+  catalogues before building, and the build fails if the wheel ends up with
+  fewer `.mo` files than `.po` files.
+
 * The `example/` project, which could not start on any supported Django, is
   replaced by `demo/` -- a working project that runs against either the plain
   admin (`make demo`) or grappelli (`make demo-grappelli`) from one set of

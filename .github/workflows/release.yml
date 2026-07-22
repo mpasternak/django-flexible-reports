@@ -45,11 +45,38 @@ jobs:
             exit 1
           }
 
+      # Django reads compiled .mo catalogues, not the .po sources, and *.mo is
+      # gitignored. Every release up to and including 0.3.2 therefore shipped
+      # the Polish .po with no .mo beside it, so the translation silently did
+      # nothing for anyone installing from PyPI. Compile before building.
+      - name: Install gettext
+        run: sudo apt-get install -y gettext
+
+      - name: Compile translations
+        run: uv run django-admin compilemessages
+        working-directory: flexible_reports
+
       - name: Build
         run: uv build
 
       - name: Check metadata renders on PyPI
         run: uvx twine check dist/*
+
+      # Guard the above: package-data globs and build backends change, and a
+      # missing catalogue is invisible until a user reports untranslated text.
+      - name: Check the built wheel carries the compiled catalogues
+        run: |
+          uv run --no-project python - <<'PY'
+          import glob, sys, zipfile
+
+          wheel = glob.glob("dist/*.whl")[0]
+          names = zipfile.ZipFile(wheel).namelist()
+          mo = [n for n in names if n.endswith(".mo")]
+          po = [n for n in names if n.endswith(".po")]
+          print(f"{wheel}: {len(mo)} .mo, {len(po)} .po")
+          if len(mo) < len(po):
+              sys.exit(f"::error::wheel ships {len(po)} .po but only {len(mo)} .mo")
+          PY
 
       - uses: actions/upload-artifact@v4
         with:

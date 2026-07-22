@@ -1,4 +1,4 @@
-.PHONY: clean-pyc clean-build docs docs-build help demo demo-grappelli demo-reset
+.PHONY: clean-pyc clean-build docs docs-build help demo demo-grappelli demo-reset messages release sdist test-grappelli
 .DEFAULT_GOAL := help
 
 # The demo project. It lives in demo/ and runs on SQLite, so no services are
@@ -64,11 +64,21 @@ docs: ## serve the documentation locally, rebuilding on save
 docs-build: ## build the documentation exactly the way CI does
 	$(MKDOCS) build --strict
 
-release: clean ## package and upload a release
-	uv build
-	uv publish
+## Django loads compiled .mo catalogues, not the .po sources, and *.mo is
+## gitignored -- so anything built without this step ships a translation that
+## silently does nothing. Requires gettext (brew install gettext).
+messages: ## compile the translation catalogues
+	cd flexible_reports && uv run django-admin compilemessages
 
-sdist: clean ## package
+release: ## tag a release; pushing the tag builds and publishes from CI
+	@echo "Releases are cut by tagging, not from a laptop:"
+	@echo "  uv run bump-my-version bump [patch|minor|major]"
+	@echo "  git push origin master --follow-tags"
+	@echo "Pushing the tag runs .github/workflows/release.yml, which compiles"
+	@echo "the catalogues, builds, publishes to PyPI over Trusted Publishing"
+	@echo "and opens the GitHub release."
+
+sdist: clean messages ## build a source distribution locally
 	uv build --sdist
 	ls -l dist
 
