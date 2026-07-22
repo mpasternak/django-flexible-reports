@@ -65,6 +65,10 @@ msgstr "Tytuł"
 msgid "Position"
 msgstr "Pozycja"
 
+#: flexible_reports/models/cloning.py:39
+msgid "copy"
+msgstr "kopia"
+
 #: flexible_reports/models/column.py:14
 msgid "Sortable"
 msgstr "Zezwalaj na sortowanie"

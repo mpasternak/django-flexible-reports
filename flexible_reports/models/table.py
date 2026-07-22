@@ -10,7 +10,7 @@ except ImportError:
     from django.contrib.postgres.fields.jsonb import JSONField
 
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import models, transaction
 from django.utils.text import format_lazy
 
 try:
@@ -19,6 +19,7 @@ except ImportError:
     from django.utils.translation import ugettext_lazy as _
 
 from .behaviors import Labelled, Orderable
+from .cloning import next_free_label
 
 
 class SortWithOtherTables:
@@ -156,3 +157,55 @@ class Table(Labelled):
 
     def get_prefix(self):
         return AllSortOptions[self.sort_option].get_prefix(None, self)
+
+    def clone(self):
+        """Copy this table together with its columns and sort order.
+
+        Returns the newly created :class:`Table`.
+
+        Neither ``self`` nor any object reachable from it is modified: after
+        the call ``self.pk`` is unchanged and a subsequent ``self.save()``
+        still updates the original. Children are therefore fetched with a
+        *fresh* queryset -- going through ``self.column_set`` would hand back
+        the instances cached by ``prefetch_related()``, and nulling their
+        primary keys would corrupt objects the caller still holds.
+
+        Reports using this table are deliberately left alone.
+        """
+        from .column import Column
+
+        with transaction.atomic():
+            columns = list(Column.objects.filter(parent=self))
+            column_orders = list(ColumnOrder.objects.filter(table=self))
+
+            clone = Table.objects.get(pk=self.pk)
+            clone.pk = None
+            clone._state.adding = True
+            clone.label = next_free_label(Table.objects.all(), "label", self.label)
+            clone.save()
+
+            # old Column pk -> freshly saved Column
+            column_map = {}
+            for column in columns:
+                old_pk = column.pk
+                column.pk = None
+                column._state.adding = True
+                column.parent = clone
+                column.save()
+                column_map[old_pk] = column
+
+            for column_order in column_orders:
+                old_column_id = column_order.column_id
+                column_order.pk = None
+                column_order._state.adding = True
+                # Both foreign keys have to be repointed. Without ``table``
+                # the entry would stay with the original and the clone would
+                # silently lose its ordering; without ``column`` the clone
+                # would sort by the original's columns.
+                column_order.table = clone
+                new_column = column_map.get(old_column_id)
+                if new_column is not None:
+                    column_order.column = new_column
+                column_order.save()
+
+            return clone
