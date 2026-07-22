@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, ValidationError
-from django.db import models
+from django.db import models, transaction
 from django.template.loader import get_template
 try:
     from django.utils.translation import gettext_lazy as _
@@ -9,6 +9,7 @@ except ImportError:
     from django.utils.translation import ugettext_lazy as _
 
 from .behaviors import Orderable, Titled
+from .cloning import next_free_label, next_free_slug
 from .validators import TemplateValidator
 
 DATA_FROM_DATASOURCE = 0
@@ -133,3 +134,45 @@ class Report(Titled):
 
     def set_context(self, context):
         self._context = context
+
+    def clone(self):
+        """Copy this report together with its elements.
+
+        Returns the newly created :class:`Report`.
+
+        The copy is *shallow*: the cloned elements point at the very same
+        :class:`~flexible_reports.models.table.Table` and
+        :class:`~flexible_reports.models.datasource.Datasource` rows. Whoever
+        needs an independent table clones that table separately and repoints
+        the element.
+
+        As in ``Table.clone()``, neither ``self`` nor anything reachable from
+        it is modified -- hence the fresh queryset for the elements instead of
+        the (possibly prefetch-cached) related manager.
+        """
+        with transaction.atomic():
+            elements = list(ReportElement.objects.filter(parent=self))
+
+            clone = Report.objects.get(pk=self.pk)
+            clone.pk = None
+            clone._state.adding = True
+            clone.title = next_free_label(Report.objects.all(), "title", self.title)
+            clone.slug = next_free_slug(
+                Report.objects.all(),
+                "slug",
+                self.slug,
+                self._meta.get_field("slug").max_length,
+            )
+            clone.save()
+
+            for element in elements:
+                element.pk = None
+                element._state.adding = True
+                element.parent = clone
+                # Element slugs stay as they are: ``unique_together`` is
+                # ``("parent", "slug")`` so they cannot collide under the new
+                # parent, and the copied report template addresses elements by
+                # slug -- renaming them would break it.
+                element.save()
+
+            return clone

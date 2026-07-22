@@ -3,7 +3,7 @@ import copy
 import operator
 import sys
 from collections import OrderedDict, defaultdict
-from functools import reduce
+from functools import lru_cache, reduce
 from tempfile import NamedTemporaryFile
 
 import bleach
@@ -23,6 +23,26 @@ from django_tables2.tables import Table
 from tablib.core import Databook, Dataset
 
 from flexible_reports.models.report import DATA_FROM_DATASOURCE
+
+
+@lru_cache(maxsize=512)
+def _compiled_template(template_code):
+    """Compile a template once per distinct template source.
+
+    ``TemplateColumn.render`` compiles its template for every single cell,
+    which dominates the cost of rendering a large table. The cache is keyed by
+    the template source, so it needs no invalidation: editing a template in the
+    database produces a different string, hence a different key.
+
+    The compiled ``Template`` must never be pinned onto a column instance:
+    columns live in ``Table.base_columns`` and are deep-copied on every table
+    instantiation, and a ``Template`` holds a reference to the template engine.
+
+    ``cache_clear()`` is available for tests that swap the template engine with
+    ``override_settings(TEMPLATES=...)``, as a cached ``Template`` remembers the
+    engine active at compilation time.
+    """
+    return Template(template_code)
 
 
 class CounterMixin:
@@ -57,7 +77,7 @@ class FooterMixin:
 
         context = Context({"value": value, "error": error, "count": len(table.data)})
 
-        return Template(self.footer_template).render(context=context)
+        return _compiled_template(self.footer_template).render(context=context)
 
 
 class StripHTMLOnExportMixin:
@@ -81,6 +101,39 @@ class DjangoTables2TemplateColumn(
         StripHTMLOnExportMixin.__init__(self, strip_html_on_export)
         CounterMixin.__init__(self)
         TemplateColumn.__init__(self, *args, **kw)
+
+    def render(self, record, table, value, bound_column, **kwargs):
+        # This is the body of ``TemplateColumn.render``, with the per-cell
+        # ``Template(self.template_code)`` compilation replaced by the
+        # module-level, content-keyed cache.
+        #
+        # Columns rendering a template file (``template_name``) go through the
+        # parent, and so do old django-tables2 releases without
+        # ``get_context_data`` -- ``pyproject.toml`` only requires
+        # ``django-tables2>=1.16.0``, which predates that method.
+        if not self.template_code or not hasattr(self, "get_context_data"):
+            return super().render(
+                record=record,
+                table=table,
+                value=value,
+                bound_column=bound_column,
+                **kwargs,
+            )
+
+        # If the table is being rendered using `render_table`, it hackily
+        # attaches the context to the table as a gift to `TemplateColumn`.
+        parent_context = getattr(table, "context", Context())
+
+        context = self.get_context_data(
+            record=record, table=table, value=value, bound_column=bound_column, **kwargs
+        )
+        # ``update`` is used as a context manager on purpose: the cell
+        # variables have to be popped again once the cell has been rendered,
+        # otherwise they leak into the next cell.
+        with parent_context.update(context):
+            request = getattr(table, "request", None)
+            parent_context["request"] = request
+            return _compiled_template(self.template_code).render(parent_context)
 
 
 class DjangoTables2Column(StripHTMLOnExportMixin, FooterMixin, Column):
@@ -114,35 +167,31 @@ def column(column):
     return (column.label, klass)
 
 
-_table_cache = {}
-
-
 def _table(table):
-    global _table_cache
+    # The class is rebuilt on every call. It used to be cached per ``Table.pk``
+    # for the lifetime of the process, which made label changes and removed
+    # columns invisible until a restart. The cache saved ~0.5 ms per render,
+    # far less than caching the compiled column templates does.
+    order_by = []
+    for column_order in (
+        table.columnorder_set.all().select_related().order_by("position")
+    ):
+        order_by.append(column_order.get())
+    table.order_by = order_by
 
-    if table.pk not in _table_cache:
-        order_by = []
-        for column_order in (
-            table.columnorder_set.all().select_related().order_by("position")
-        ):
-            order_by.append(column_order.get())
-        table.order_by = order_by
+    class AdHocTable(Table):
+        class Meta:
+            attrs = table.attrs or {}
+            order_by = table.order_by
+            per_page = sys.maxsize
+            prefix = table.get_prefix()
+            empty_text = mark_safe(table.empty_template)
 
-        class AdHocTable(Table):
-            class Meta:
-                attrs = table.attrs or {}
-                order_by = table.order_by
-                per_page = sys.maxsize
-                prefix = table.get_prefix()
-                empty_text = mark_safe(table.empty_template)
+    for c in table.column_set.all():
+        label, klass = column(c)
+        AdHocTable.base_columns[label] = klass
 
-        for c in table.column_set.all():
-            label, klass = column(c)
-            AdHocTable.base_columns[label] = klass
-
-        _table_cache[table.pk] = AdHocTable
-
-    return _table_cache[table.pk]
+    return AdHocTable
 
 
 def table(table, request, object_list):

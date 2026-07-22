@@ -19,6 +19,16 @@ msgstr ""
 "|| n%100>=20) ? 1 : 2);\n"
 "X-Generator: Poedit 2.0.4\n"
 
+#: flexible_reports/admin/cloning.py:66
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "Obiekt %(name)s o kluczu głównym %(key)r nie istnieje."
+
+#: flexible_reports/admin/cloning.py:80
+#, python-format
+msgid "Cloned to \"%(obj)s\"."
+msgstr "Sklonowano do „%(obj)s”."
+
 #: flexible_reports/admin/datasource.py:37
 #, python-format
 msgid ""
@@ -64,6 +74,10 @@ msgstr "Tytuł"
 #: flexible_reports/models/behaviors.py:47
 msgid "Position"
 msgstr "Pozycja"
+
+#: flexible_reports/models/cloning.py:39
+msgid "copy"
+msgstr "kopia"
 
 #: flexible_reports/models/column.py:14
 msgid "Sortable"
@@ -428,6 +442,10 @@ msgstr "Proszę wpisać prefiks grupy, jeżeli chcesz sortować tą tabelę w gr
 #, python-format
 msgid "Cannot compile template (%(exception)s)"
 msgstr "Nie mogę skompilować kodu templatki (wyjątek: %(exception)s)"
+
+#: flexible_reports/templates/admin/flexible_reports/change_form_with_clone.html:14
+msgid "Clone"
+msgstr "Klonuj"
 
 #~ msgid ""
 #~ "\n"

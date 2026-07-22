@@ -11,6 +11,7 @@ from flexible_reports.admin.helpers import BiggerTextarea
 
 from ..models import Report
 from ..models.report import ReportElement
+from .cloning import CloneAdminMixin
 from .helpers import SmallerTextarea, SortableHiddenMixin
 
 
@@ -51,7 +52,7 @@ class ReportForm(forms.ModelForm):
 
 
 @admin.register(Report)
-class ReportAdmin(admin.ModelAdmin):
+class ReportAdmin(CloneAdminMixin, admin.ModelAdmin):
     list_display = ["title", "slug", "elements"]
     inlines = [
         ReportElementInline,
