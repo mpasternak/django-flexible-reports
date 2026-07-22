@@ -1,9 +1,10 @@
 # Dependencies for building the documentation.
 #
 # Deliberately separate from pyproject.toml: the docs are prose only, they
-# import nothing but ``flexible_reports.__version__``, and nobody installing
-# the package needs Sphinx.
+# import nothing from this package, and nobody installing
+# django-flexible-reports needs MkDocs.
 #
-#   sphinx-build -b html -W docs docs/_build/html
-sphinx>=7.0
-sphinx-rtd-theme>=2.0
+#   mkdocs build --strict
+mkdocs>=1.6
+mkdocs-material>=9.5
+pymdown-extensions>=10.7

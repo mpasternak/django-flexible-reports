@@ -1,7 +1,18 @@
-version: '2'
+# Local PostgreSQL for the test suite. Mirrors the `postgres` service in
+# .github/workflows/tests.yml so a green run here means the same thing as a
+# green run in CI.
 services:
-
   db:
-    image: postgres:10
+    image: postgres:16
+    environment:
+      # tests/settings.py connects as `postgres` with no password. Without
+      # this the container refuses to initialise at all ("Database is
+      # uninitialized and superuser password is not specified").
+      POSTGRES_HOST_AUTH_METHOD: trust
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
