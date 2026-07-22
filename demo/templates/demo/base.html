@@ -1,0 +1,69 @@
+{% load i18n %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}django-flexible-reports demo{% endblock %}</title>
+  {# Deliberately no CDN: the demo has to work offline. #}
+  <style>
+    :root { color-scheme: light dark; }
+    body {
+      margin: 0;
+      font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+            "Helvetica Neue", Arial, sans-serif;
+      color: #1c1c1c;
+      background: #fbfbfa;
+    }
+    header {
+      background: #2b3a42;
+      color: #fff;
+      padding: 1rem 1.5rem;
+    }
+    header a { color: #9fd3ff; }
+    header h1 { margin: 0; font-size: 1.25rem; }
+    main { max-width: 60rem; margin: 0 auto; padding: 1.5rem; }
+    h1, h2, h3 { line-height: 1.2; }
+    table.report-table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 0 0 2rem;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, .12);
+    }
+    table.report-table th,
+    table.report-table td {
+      border-bottom: 1px solid #e3e3e0;
+      padding: .45rem .6rem;
+      text-align: left;
+      vertical-align: top;
+    }
+    table.report-table thead th { background: #eef1f3; }
+    table.report-table tfoot td { font-weight: bold; background: #f6f7f8; }
+    table.report-table td.col-num, table.report-table th.col-num,
+    table.report-table td.col-nr, table.report-table th.col-nr {
+      text-align: right;
+      white-space: nowrap;
+    }
+    table.report-table small { color: #666; }
+    .hint {
+      background: #fff8e1;
+      border-left: 4px solid #ffca28;
+      padding: .75rem 1rem;
+      margin: 0 0 1.5rem;
+    }
+    code { background: #eceff1; padding: .1em .3em; border-radius: 3px; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>
+    django-flexible-reports demo
+    &mdash; <a href="/">report</a>
+    &middot; <a href="/admin/">admin</a>{% if grappelli %} (grappelli){% endif %}
+  </h1>
+</header>
+<main>
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>

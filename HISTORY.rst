@@ -6,6 +6,24 @@ History
 0.4.0 (unreleased)
 ++++++++++++++++++
 
+* **Backwards incompatible:** the minimum supported Django is now 5.2 LTS.
+  Tested against Django 5.2 and 6.0.
+
+* The ``example/`` project, which could not start on any supported Django, is
+  replaced by ``demo/`` -- a working project that runs against either the plain
+  admin (``make demo``) or grappelli (``make demo-grappelli``) from one set of
+  models and seed data.
+
+* Documentation is rewritten and published to
+  https://mpasternak.github.io/django-flexible-reports/. The previous
+  ``docs/readme.rst`` included a ``README.rst`` that does not exist and
+  rendered blank; the install instructions recommended ``easy_install``.
+
+* Three migrations no longer import
+  ``django.contrib.postgres.fields.jsonb``. That import pulled in
+  ``psycopg2`` at module load, so ``migrate`` failed on SQLite for anyone who
+  had installed only the runtime dependencies.
+
 * ``Table`` and ``Report`` can now be cloned from the admin, using a *Clone*
   button on the change form. Cloning a table copies its columns and its sort
   order; cloning a report copies its elements, which keep pointing at the same
@@ -15,8 +33,8 @@ History
   Both are also available programmatically as ``Table.clone()`` and
   ``Report.clone()``. Neither modifies the source object.
 
-  Note: the button has not been verified against `grappelli`, which ships its
-  own ``admin/change_form.html``.
+  The button is verified to work with `grappelli`, which ships its own
+  ``admin/change_form.html``; a regression test guards it.
 
 * Fix stale table headers. A cached table class was kept per ``Table.pk`` for
   the lifetime of the process and never invalidated, so editing a column's

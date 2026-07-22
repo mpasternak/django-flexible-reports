@@ -3,4 +3,4 @@ from django.apps import AppConfig
 
 
 class FlexibleReportsConfig(AppConfig):
-    name = 'flexible_reports'
+    name = "flexible_reports"

@@ -1,5 +1,13 @@
-.PHONY: clean-pyc clean-build docs help
+.PHONY: clean-pyc clean-build docs help demo demo-grappelli demo-reset
 .DEFAULT_GOAL := help
+
+# The demo project. It lives in demo/ and runs on SQLite, so no services are
+# needed. django-grappelli is not a dependency of this package, hence the
+# --with for the grappelli flavour.
+DEMO_MANAGE := uv run python demo/manage.py
+DEMO_MANAGE_GRAPPELLI := DJANGO_SETTINGS_MODULE=demo.settings_grappelli \
+	uv run --with django-grappelli python demo/manage.py
+
 define BROWSER_PYSCRIPT
 import os, webbrowser, sys
 try:
@@ -42,26 +50,31 @@ coverage: ## check code coverage quickly with the default Python
 	coverage html
 	open htmlcov/index.html
 
-docs: ## generate Sphinx HTML documentation, including API docs
-	rm -f docs/django-flexible-reports.rst
-	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ flexible_reports
+# No sphinx-apidoc: it wrote modules.rst and django-flexible-reports.rst into
+# docs/, where they sat outside every toctree and failed the -W build that CI
+# runs. The prose documentation is maintained by hand.
+docs: ## generate Sphinx HTML documentation
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 	$(BROWSER) docs/_build/html/index.html
 
 release: clean ## package and upload a release
-	python setup.py sdist upload
-	python setup.py bdist_wheel upload
+	uv build
+	uv publish
 
 sdist: clean ## package
-	python setup.py sdist
+	uv build --sdist
 	ls -l dist
 
-rebuild:
-	rm -rf flexible_reports/migrations
-	python example/manage.py makemigrations flexible_reports
-	rm example/db.sqlite3
-	python example/manage.py migrate
-	echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin', 'admin')" | python example/manage.py shell
-	python example/manage.py runserver 127.0.0.1:8888
+demo: ## run the demo project with the plain Django admin on :8000
+	$(DEMO_MANAGE) migrate --noinput
+	$(DEMO_MANAGE) seed_demo
+	$(DEMO_MANAGE) runserver 127.0.0.1:8000
+
+demo-grappelli: ## run the demo project with django-grappelli on :8001
+	$(DEMO_MANAGE_GRAPPELLI) migrate --noinput
+	$(DEMO_MANAGE_GRAPPELLI) seed_demo
+	$(DEMO_MANAGE_GRAPPELLI) runserver 127.0.0.1:8001
+
+demo-reset: ## throw the demo database away (next `make demo` rebuilds it)
+	rm -f demo/db.sqlite3

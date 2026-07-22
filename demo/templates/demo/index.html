@@ -1,0 +1,27 @@
+{% extends "demo/base.html" %}
+{% load flexible_reports_tags %}
+
+{% block content %}
+  {% if report %}
+    {# One tag renders the whole report: every element, its table, its
+       columns and its sort order come from the database. #}
+    {% flexible report %}
+
+    <p class="hint">
+      Everything above is defined in the database, not in this template.
+      Edit it in the <a href="/admin/flexible_reports/">admin</a>:
+      <code>Datasources</code> decide <em>which</em> rows show up,
+      <code>Tables</code>/<code>Columns</code> decide how they are rendered,
+      and the <code>Report</code> glues the two together.
+      Click a column header to sort; the sort applies to every table at once,
+      because the table's sort option is
+      &ldquo;sort with other tables&rdquo;.
+    </p>
+  {% else %}
+    <h2>No report yet</h2>
+    <p class="hint">
+      No report with the slug <code>{{ report_slug }}</code> exists.
+      Run <code>python demo/manage.py seed_demo</code> first.
+    </p>
+  {% endif %}
+{% endblock %}

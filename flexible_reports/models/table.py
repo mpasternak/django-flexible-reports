@@ -3,20 +3,11 @@
 from collections import OrderedDict
 
 from django.contrib.contenttypes.models import ContentType
-
-try:
-    from django.db.models import JSONField
-except ImportError:
-    from django.contrib.postgres.fields.jsonb import JSONField
-
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
+from django.db.models import JSONField
 from django.utils.text import format_lazy
-
-try:
-    from django.utils.translation import gettext_lazy as _
-except ImportError:
-    from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from .behaviors import Labelled, Orderable
 from .cloning import next_free_label
@@ -89,7 +80,7 @@ class ColumnOrder(Orderable):
     def get(self):
         if not self.desc:
             return self.column.label
-        return f"-{ self.column.label }"
+        return f"-{self.column.label}"
 
 
 class Table(Labelled):

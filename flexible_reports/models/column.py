@@ -1,16 +1,8 @@
 # -*- coding: utf-8 -*-
-try:
-    from django.db.models import JSONField
-except ImportError:
-    from django.contrib.postgres.fields.jsonb import JSONField
-
 from django.core.exceptions import ValidationError
 from django.db import models
-
-try:
-    from django.utils.translation import gettext_lazy as _
-except ImportError:
-    from django.utils.translation import ugettext_lazy as _
+from django.db.models import JSONField
+from django.utils.translation import gettext_lazy as _
 
 from .behaviors import Labelled, Orderable
 
@@ -120,7 +112,6 @@ class Column(Labelled, Orderable):
         parent_model = self.parent.base_model.model_class()
 
         if self.attr_name:
-
             path = self.attr_name.split(".")
 
             current_model = parent_model
