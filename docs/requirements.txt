@@ -1,0 +1,9 @@
+# Dependencies for building the documentation.
+#
+# Deliberately separate from pyproject.toml: the docs are prose only, they
+# import nothing but ``flexible_reports.__version__``, and nobody installing
+# the package needs Sphinx.
+#
+#   sphinx-build -b html -W docs docs/_build/html
+sphinx>=7.0
+sphinx-rtd-theme>=2.0

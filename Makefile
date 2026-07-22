@@ -50,20 +50,20 @@ coverage: ## check code coverage quickly with the default Python
 	coverage html
 	open htmlcov/index.html
 
-docs: ## generate Sphinx HTML documentation, including API docs
-	rm -f docs/django-flexible-reports.rst
-	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ flexible_reports
+# No sphinx-apidoc: it wrote modules.rst and django-flexible-reports.rst into
+# docs/, where they sat outside every toctree and failed the -W build that CI
+# runs. The prose documentation is maintained by hand.
+docs: ## generate Sphinx HTML documentation
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 	$(BROWSER) docs/_build/html/index.html
 
 release: clean ## package and upload a release
-	python setup.py sdist upload
-	python setup.py bdist_wheel upload
+	uv build
+	uv publish
 
 sdist: clean ## package
-	python setup.py sdist
+	uv build --sdist
 	ls -l dist
 
 demo: ## run the demo project with the plain Django admin on :8000
