@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Naming helpers shared by :meth:`Table.clone` and :meth:`Report.clone`.
 
 The suffix appended to a clone's name is translatable: the ``msgid`` is

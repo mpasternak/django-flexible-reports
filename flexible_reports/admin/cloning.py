@@ -1,5 +1,3 @@
-# -*- encoding: utf-8 -*-
-
 """Admin glue exposing ``Table.clone()`` and ``Report.clone()`` as a button.
 
 The cloning logic itself lives on the models; this module only wires it into

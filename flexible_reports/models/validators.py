@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 from django.core.exceptions import ValidationError
 from django.template import Template
 from django.utils.translation import gettext_lazy as _

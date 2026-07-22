@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models, transaction

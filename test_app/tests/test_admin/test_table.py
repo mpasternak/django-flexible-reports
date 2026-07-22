@@ -1,5 +1,3 @@
-# -*- encoding: utf-8 -*-
-
 import pytest
 from django.contrib.contenttypes.models import ContentType
 from django.urls.base import reverse

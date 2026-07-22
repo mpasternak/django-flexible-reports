@@ -1,5 +1,3 @@
-# -*- encoding: utf-8 -*-
-
 import pytest
 from django.contrib.admin.models import ADDITION, LogEntry
 from django.contrib.auth.models import Permission
