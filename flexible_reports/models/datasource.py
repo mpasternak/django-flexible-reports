@@ -1,11 +1,7 @@
 # -*- encoding: utf-8 -*-
 from django.core.exceptions import ValidationError
 from django.db import models
-
-try:
-    from django.utils.translation import gettext_lazy as _
-except ImportError:
-    from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from .. import utils
 from ..query_backends import DSL, QUERY_LANGUAGE_CHOICES, get_backend

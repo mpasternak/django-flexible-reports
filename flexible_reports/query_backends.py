@@ -13,11 +13,7 @@ parametrise queries with values from the report context.
 
 from django.core.exceptions import ValidationError
 from django.template import Context, Template
-
-try:
-    from django.utils.translation import gettext_lazy as _
-except ImportError:  # Django < 4
-    from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from . import utils
 

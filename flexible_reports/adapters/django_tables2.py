@@ -9,13 +9,8 @@ from tempfile import NamedTemporaryFile
 import bleach
 import lxml.html
 import pypandoc
+from django.template import Context
 from django.template.base import Template
-
-try:
-    from django.template import Context
-except ImportError:
-    from django.template.base import Context
-
 from django.utils.safestring import mark_safe
 from django_tables2.columns.templatecolumn import Column, TemplateColumn
 from django_tables2.export.export import TableExport

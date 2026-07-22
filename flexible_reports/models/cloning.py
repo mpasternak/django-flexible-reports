@@ -10,11 +10,7 @@ one ``"My table (kopia)"``.
 import re
 
 from django.utils.text import slugify
-
-try:
-    from django.utils.translation import gettext as _
-except ImportError:  # pragma: no cover
-    from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 __all__ = [
     "copy_word",

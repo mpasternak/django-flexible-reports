@@ -11,12 +11,8 @@ from django.contrib.admin.utils import unquote
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseRedirect
 from django.urls import path, reverse
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
-
-try:
-    from django.utils.translation import gettext_lazy as _
-except ImportError:  # pragma: no cover
-    from django.utils.translation import ugettext_lazy as _
 
 __all__ = ["CloneAdminMixin"]
 
