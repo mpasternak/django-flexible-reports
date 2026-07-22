@@ -23,7 +23,7 @@ class ColumnForm(forms.ModelForm):
 
 class ColumnOrderForm(forms.ModelForm):
     def __init__(self, parent, *args, **kw):
-        super(ColumnOrderForm, self).__init__(*args, **kw)
+        super().__init__(*args, **kw)
         self.fields["column"].queryset = Column.objects.filter(parent=parent)
 
 
@@ -33,9 +33,7 @@ class ColumnOrderInline(SortableHiddenMixin, admin.TabularInline):
     fields = ["column", "desc", "position"]
 
     def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
-        field = super(ColumnOrderInline, self).formfield_for_foreignkey(
-            db_field, request, **kwargs
-        )
+        field = super().formfield_for_foreignkey(db_field, request, **kwargs)
         if db_field.name == "column":
             if request._parent_ is not None:
                 field.queryset = field.queryset.filter(
@@ -108,4 +106,4 @@ class TableAdmin(CloneAdminMixin, admin.ModelAdmin):
 
     def get_form(self, request, obj=None, **kwargs):
         request._parent_ = obj
-        return super(TableAdmin, self).get_form(request, obj, **kwargs)
+        return super().get_form(request, obj, **kwargs)
