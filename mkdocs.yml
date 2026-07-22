@@ -1,0 +1,98 @@
+site_name: Django Flexible Reports
+site_description: A framework for database-defined reports in Django.
+site_author: Michał Pasternak
+site_url: https://mpasternak.github.io/django-flexible-reports/
+
+repo_url: https://github.com/mpasternak/django-flexible-reports
+repo_name: mpasternak/django-flexible-reports
+edit_uri: edit/master/docs/
+
+copyright: Copyright &copy; 2017 Michał Pasternak &mdash; MIT licence
+
+docs_dir: docs
+site_dir: site
+
+# The old Sphinx build ran with -W, so a broken cross-reference failed CI.
+# strict: true is the MkDocs equivalent: every warning becomes an error.
+strict: true
+
+# ``docs/superpowers/`` is an archive of design specs and plans kept next to
+# the documentation on purpose. It is not part of the manual and must never be
+# published; excluding it here also keeps it out of the "not in nav" warnings.
+exclude_docs: |
+  superpowers/
+
+theme:
+  name: material
+  language: en
+  features:
+    - navigation.sections
+    - navigation.top
+    - navigation.tracking
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.action.edit
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+plugins:
+  - search
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  # AUTHORS.md, CONTRIBUTING.md and HISTORY.md live in the repository root so
+  # that GitHub shows them; the pages below pull them in instead of keeping a
+  # second copy on disk. base_path is the directory mkdocs.yml lives in.
+  - pymdownx.snippets:
+      base_path:
+        - .
+      check_paths: true
+
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+  anchors: warn
+
+nav:
+  - Home: index.md
+  - User guide:
+      - Installation: installation.md
+      - Quickstart: quickstart.md
+      - The data model: concepts.md
+      - Query languages: queries.md
+      - Rendering reports: rendering.md
+      - Exporting: exporting.md
+      - Cloning: cloning.md
+      - The demo project: demo.md
+  - Project:
+      - Contributing: contributing.md
+      - Credits: authors.md
+      - History: history.md

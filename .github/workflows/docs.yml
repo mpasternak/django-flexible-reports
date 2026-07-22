@@ -33,15 +33,16 @@ jobs:
           cache-dependency-path: docs/requirements.txt
 
       - name: Install documentation dependencies
-        # Sphinx and the theme only. ``docs/conf.py`` imports nothing from
-        # this package except ``__version__``, so Django is not needed and the
-        # docs build stays independent of ``pyproject.toml``.
+        # MkDocs, the Material theme and pymdown-extensions only. The manual is
+        # prose: it imports nothing from this package, so Django is not needed
+        # and the docs build stays independent of pyproject.toml.
         run: pip install -r docs/requirements.txt
 
       - name: Build the documentation
-        # -W: any Sphinx warning fails the build, so a broken cross-reference
-        # or a malformed table is caught in the pull request.
-        run: sphinx-build -b html -W --keep-going docs docs/_build/html
+        # --strict: any MkDocs warning fails the build, so a broken
+        # cross-reference or a missing page is caught in the pull request.
+        # (This is what -W did for the old Sphinx build.)
+        run: mkdocs build --strict
 
       - name: Upload the Pages artifact
         # Only the push to master needs an artifact; on pull requests the
@@ -49,7 +50,7 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
-          path: docs/_build/html
+          path: site
 
   deploy:
     # Never deploy from a pull request -- a fork could otherwise publish to
@@ -69,6 +70,11 @@ jobs:
     steps:
       - name: Configure Pages
         uses: actions/configure-pages@v5
+        with:
+          # Pages is already enabled on the repository by hand. Leaving this
+          # at the default would make the action try to enable it through the
+          # API, which needs a token this workflow does not have.
+          enablement: false
 
       - name: Deploy to GitHub Pages
         id: deployment

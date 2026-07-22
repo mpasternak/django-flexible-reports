@@ -199,6 +199,21 @@ The test suite runs against PostgreSQL; see `tests/settings.py` (the
 `POSTGRES_HOST` / `POSTGRES_PORT` environment variables are honoured), or start
 one with the bundled `docker-compose.yml`.
 
+## Contributing
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for the development setup, how to run
+the tests and the grappelli integration run, linting, and what CI checks.
+The changelog is [`HISTORY.md`](HISTORY.md).
+
+The manual under [`docs/`](docs/) is Markdown, built with
+[MkDocs](https://www.mkdocs.org/) and the
+[Material](https://squidfunk.github.io/mkdocs-material/) theme:
+
+```
+make docs         # live preview on http://127.0.0.1:8000/
+make docs-build   # build with --strict, exactly as CI does
+```
+
 ## License
 
 MIT

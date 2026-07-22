@@ -1,4 +1,4 @@
-.PHONY: clean-pyc clean-build docs help demo demo-grappelli demo-reset
+.PHONY: clean-pyc clean-build docs docs-build help demo demo-grappelli demo-reset
 .DEFAULT_GOAL := help
 
 # The demo project. It lives in demo/ and runs on SQLite, so no services are
@@ -35,28 +35,34 @@ clean-pyc: ## remove Python file artifacts
 	find . -name '*.pyo' -exec rm -f {} +
 	find . -name '*~' -exec rm -f {} +
 
-lint: ## check style with flake8
-	flake8 flexible_reports tests
+lint: ## check style and formatting with ruff
+	uv run ruff check .
+	uv run ruff format --check .
 
-test: ## run tests quickly with the default Python
-	pytest tests
+# The suite lives in test_app/tests; `tests/` holds only settings.py and
+# urls.py. This target used to point at `tests`, so it collected nothing and
+# still exited 0 -- a green `make test` that ran no tests at all.
+test: ## run the test suite
+	uv run pytest test_app/tests
 
-test-all: ## run tests on every Python version with tox
-	tox
+test-grappelli: ## run the grappelli integration tests (optional dependency)
+	uv run --with django-grappelli pytest test_app/tests/test_admin/test_grappelli.py
 
-coverage: ## check code coverage quickly with the default Python
-	coverage run --source flexible_reports runtests.py tests
-	coverage report -m
-	coverage html
-	open htmlcov/index.html
+coverage: ## check code coverage and open the report
+	uv run pytest test_app/tests --cov=flexible_reports --cov-report=term-missing --cov-report=html
+	$(BROWSER) htmlcov/index.html
 
-# No sphinx-apidoc: it wrote modules.rst and django-flexible-reports.rst into
-# docs/, where they sat outside every toctree and failed the -W build that CI
-# runs. The prose documentation is maintained by hand.
-docs: ## generate Sphinx HTML documentation
-	$(MAKE) -C docs clean
-	$(MAKE) -C docs html
-	$(BROWSER) docs/_build/html/index.html
+# The manual is prose written by hand in docs/*.md; there is no API
+# autogeneration step. MkDocs and the Material theme are pinned in
+# docs/requirements.txt and are deliberately not dependencies of the package,
+# hence the --with flags.
+MKDOCS := uv run --with mkdocs-material --with pymdown-extensions mkdocs
+
+docs: ## serve the documentation locally, rebuilding on save
+	$(MKDOCS) serve
+
+docs-build: ## build the documentation exactly the way CI does
+	$(MKDOCS) build --strict
 
 release: clean ## package and upload a release
 	uv build
