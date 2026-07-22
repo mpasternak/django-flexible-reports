@@ -101,9 +101,5 @@ jobs:
       - name: Lint with ruff
         run: uv run ruff check .
 
-      # `|| true` stays here on purpose, for now: ~10 files across docs/,
-      # flexible_reports/ and test_app/ predate `ruff format` and reformatting
-      # them is a separate mechanical commit. Drop the `|| true` in that same
-      # commit so the check starts failing the build.
       - name: Check formatting with ruff
-        run: uv run ruff format --check . || true
+        run: uv run ruff format --check .

@@ -7,9 +7,7 @@ from flexible_reports.models.table import SortIndividually, SortInGroup, Table
 
 @pytest.mark.django_db
 def test_table():
-    t = Table(
-        sort_option=SortInGroup.id,
-        group_prefix=None)
+    t = Table(sort_option=SortInGroup.id, group_prefix=None)
 
     with pytest.raises(ValidationError):
         t.clean()

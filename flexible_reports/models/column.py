@@ -112,7 +112,6 @@ class Column(Labelled, Orderable):
         parent_model = self.parent.base_model.model_class()
 
         if self.attr_name:
-
             path = self.attr_name.split(".")
 
             current_model = parent_model

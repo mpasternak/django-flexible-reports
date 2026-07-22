@@ -80,7 +80,7 @@ class ColumnOrder(Orderable):
     def get(self):
         if not self.desc:
             return self.column.label
-        return f"-{ self.column.label }"
+        return f"-{self.column.label}"
 
 
 class Table(Labelled):
