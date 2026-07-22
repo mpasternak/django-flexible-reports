@@ -1,5 +1,14 @@
 # History
 
+## Unreleased
+
+* Python 3.14 is supported and tested, against both Django 5.2 LTS and 6.0.
+
+* PyPI metadata is fuller: real keywords instead of just the package name, and
+  links to the documentation, repository, issue tracker and changelog rather
+  than the homepage alone. `Development Status` moves from `3 - Alpha` to
+  `5 - Production/Stable`.
+
 ## 0.4.0 (2026-07-22)
 
 * **Backwards incompatible:** the minimum supported Django is now 5.2 LTS.

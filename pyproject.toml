@@ -10,9 +10,17 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
 authors = [{name = "Michał Pasternak", email = "michal.dtz@gmail.com"}]
-keywords = ["django-flexible-reports"]
+keywords = [
+    "django",
+    "reports",
+    "reporting",
+    "django-tables2",
+    "admin",
+    "djangoql",
+    "export",
+]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 5 - Production/Stable",
     "Framework :: Django",
     "Framework :: Django :: 5.2",
     "Framework :: Django :: 6.0",
@@ -22,6 +30,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
 ]
 dependencies = [
     "Django>=5.2",
@@ -59,6 +68,10 @@ test = [
 
 [project.urls]
 Homepage = "https://github.com/mpasternak/django-flexible-reports"
+Documentation = "https://mpasternak.github.io/django-flexible-reports/"
+Repository = "https://github.com/mpasternak/django-flexible-reports"
+Issues = "https://github.com/mpasternak/django-flexible-reports/issues"
+Changelog = "https://github.com/mpasternak/django-flexible-reports/blob/master/HISTORY.md"
 
 [tool.setuptools.packages.find]
 include = ["flexible_reports*"]
