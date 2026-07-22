@@ -1,5 +1,4 @@
 # -*- coding: utf-8
-from __future__ import absolute_import, unicode_literals
 
 try:
     from django.urls import re_path as url
