@@ -1,6 +1,6 @@
 # History
 
-## 0.4.0 (unreleased)
+## 0.4.0 (2026-07-22)
 
 * **Backwards incompatible:** the minimum supported Django is now 5.2 LTS.
   Tested against Django 5.2 and 6.0.

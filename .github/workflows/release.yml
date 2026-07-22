@@ -1,0 +1,112 @@
+name: Release
+
+# Publishing is driven by tags: `bump-my-version bump minor` writes the new
+# version, commits and tags it, and pushing that tag runs this workflow.
+#
+# Authentication is PyPI Trusted Publishing (OIDC) -- there is no API token in
+# this repository and none needs to exist. PyPI is configured to trust exactly
+# this repository, this workflow file and the `pypi` environment below; change
+# any of the three and PyPI will refuse the upload.
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build distributions
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Set up Python
+        run: uv python install 3.13
+
+      # A tag and the version inside the package can drift apart -- someone
+      # tags v0.4.0 by hand while pyproject.toml still says 0.3.2, and the
+      # upload succeeds under the wrong version. Fail loudly instead.
+      - name: Check the tag matches the packaged version
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          pkg=$(uv run --no-project python -c "
+          import tomllib, pathlib
+          print(tomllib.loads(pathlib.Path('pyproject.toml').read_text())['project']['version'])
+          ")
+          echo "tag=$tag packaged=$pkg"
+          test "$tag" = "$pkg" || {
+            echo "::error::tag $GITHUB_REF_NAME does not match pyproject version $pkg"
+            exit 1
+          }
+
+      - name: Build
+        run: uv build
+
+      - name: Check metadata renders on PyPI
+        run: uvx twine check dist/*
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  pypi:
+    name: Publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+
+    # Named environment so the trusted-publisher binding on PyPI can be scoped
+    # to it, and so a protection rule can gate uploads if you ever want one.
+    environment:
+      name: pypi
+      url: https://pypi.org/p/django-flexible-reports
+
+    permissions:
+      id-token: write # required for Trusted Publishing; nothing else needs it
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+  github-release:
+    name: Create the GitHub release
+    needs: pypi
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write # required to create the release
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Create release with the changelog section for this version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          # Pull just this version's section out of HISTORY.md.
+          awk -v v="$version" '
+            $0 ~ "^## " v " " {found=1; next}
+            found && /^## / {exit}
+            found {print}
+          ' HISTORY.md > notes.md
+          test -s notes.md || echo "See HISTORY.md." > notes.md
+          gh release create "$GITHUB_REF_NAME" dist/* \
+            --title "$GITHUB_REF_NAME" \
+            --notes-file notes.md
