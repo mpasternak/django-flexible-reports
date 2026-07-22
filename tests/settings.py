@@ -9,7 +9,7 @@ SECRET_KEY = "99999999999999999999999999999999999999999999999999"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "ENGINE": "django.db.backends.postgresql",
         "NAME": "flexible_reports",
         "USER": "postgres",
         "PASSWORD": None,
