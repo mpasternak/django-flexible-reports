@@ -55,8 +55,29 @@ jobs:
           uv sync --all-extras
           uv pip install "Django>=${{ matrix.django-version }},<${{ matrix.django-version }}.99"
 
+      # --no-sync is load-bearing: `uv run` re-syncs the environment from the
+      # lockfile by default, which silently uninstalls the Django pinned just
+      # above and reinstalls the locked one. Without it every leg of the matrix
+      # tests the same Django version while reporting the matrix one.
+      - name: Verify the pinned Django is the one under test
+        run: |
+          uv run --no-sync python -c "import django; print(django.__version__)"
+          uv run --no-sync python -c "
+          import django, sys
+          want = '${{ matrix.django-version }}'
+          got = '.'.join(django.__version__.split('.')[:2])
+          sys.exit(0 if got == want else f'expected Django {want}, got {django.__version__}')
+          "
+
       - name: Run tests
-        run: uv run pytest --cov=flexible_reports
+        run: uv run --no-sync pytest --cov=flexible_reports
+
+      # django-grappelli is deliberately NOT a declared dependency: the suite
+      # has to pass without it (the grappelli tests skip themselves). Its
+      # change_form.html shadows Django's, so the Clone button needs a run of
+      # its own with grappelli overlaid on the synced environment.
+      - name: Run grappelli integration tests
+        run: uv run --no-sync --with django-grappelli pytest test_app/tests/test_admin/test_grappelli.py
 
   lint:
     runs-on: ubuntu-latest
@@ -73,8 +94,16 @@ jobs:
       - name: Install dependencies
         run: uv sync --all-extras
 
+      # ruff is pinned in the `lint` extra (installed by the sync above) and
+      # kept in lock-step with .pre-commit-config.yaml. Do not add `--with
+      # ruff` or drop the pin: `uv run ruff` would then auto-provision the
+      # newest release and CI would lint with a different ruff than the hook.
       - name: Lint with ruff
-        run: uv run ruff check . || true
+        run: uv run ruff check .
 
+      # `|| true` stays here on purpose, for now: ~10 files across docs/,
+      # flexible_reports/ and test_app/ predate `ruff format` and reformatting
+      # them is a separate mechanical commit. Drop the `|| true` in that same
+      # commit so the check starts failing the build.
       - name: Check formatting with ruff
         run: uv run ruff format --check . || true

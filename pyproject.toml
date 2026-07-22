@@ -38,6 +38,14 @@ dependencies = [
 dev = [
     "bump-my-version",
 ]
+lint = [
+    # Pinned exactly, and kept in lock-step with the ``rev`` of
+    # astral-sh/ruff-pre-commit in .pre-commit-config.yaml. Without a pin here
+    # `uv run ruff` in CI silently auto-provisions whatever ruff is newest,
+    # so the hook and the workflow would drift apart and disagree about
+    # formatting.
+    "ruff==0.15.22",
+]
 test = [
     "coverage",
     "pytest",
