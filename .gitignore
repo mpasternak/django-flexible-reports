@@ -108,8 +108,8 @@ ENV/
 .mypy_cache/
 
 .idea
-example/db.sqlite
-example/db.sqlite3
+demo/db.sqlite
+demo/db.sqlite3
 
 # uv
 uv.lock
