@@ -1,8 +1,10 @@
 # Django Flexible Reports
 
-[![PyPI](https://badge.fury.io/py/django-flexible-reports.svg)](https://badge.fury.io/py/django-flexible-reports)
+[![PyPI Version](https://img.shields.io/pypi/v/django-flexible-reports.svg)](https://pypi.org/project/django-flexible-reports/)
+[![Python Version](https://img.shields.io/pypi/pyversions/django-flexible-reports.svg)](https://pypi.org/project/django-flexible-reports/)
 [![Tests](https://github.com/mpasternak/django-flexible-reports/actions/workflows/tests.yml/badge.svg)](https://github.com/mpasternak/django-flexible-reports/actions/workflows/tests.yml)
 [![Docs](https://github.com/mpasternak/django-flexible-reports/actions/workflows/docs.yml/badge.svg)](https://github.com/mpasternak/django-flexible-reports/actions/workflows/docs.yml)
+[![License](https://img.shields.io/pypi/l/django-flexible-reports.svg)](LICENSE)
 
 A framework for **database-defined reports** in Django.
 
@@ -22,10 +24,10 @@ so you get sortable headers, footers/totals and export for free.
 
 ## Supported Versions
 
-|                | Python 3.10 | Python 3.11 | Python 3.12 | Python 3.13 |
-|----------------|:-----------:|:-----------:|:-----------:|:-----------:|
-| Django 5.2 LTS |      ✔      |      ✔      |      ✔      |      ✔      |
-| Django 6.0     |      —      |      —      |      ✔      |      ✔      |
+|                | Python 3.10 | Python 3.11 | Python 3.12 | Python 3.13 | Python 3.14 |
+|----------------|:-----------:|:-----------:|:-----------:|:-----------:|:-----------:|
+| Django 5.2 LTS |      ✔      |      ✔      |      ✔      |      ✔      |      ✔      |
+| Django 6.0     |      —      |      —      |      ✔      |      ✔      |      ✔      |
 
 Django 6.0 requires Python 3.12+. Django 4.2, 5.0 and 5.1 are no longer
 supported or tested — the floor is Django 5.2 LTS.
@@ -83,7 +85,13 @@ The full documentation is at
 
 ## Quickstart
 
-Install Django Flexible Reports:
+Install Django Flexible Reports, with [uv](https://docs.astral.sh/uv/):
+
+```
+uv add django-flexible-reports
+```
+
+or with pip:
 
 ```
 pip install django-flexible-reports
