@@ -46,7 +46,7 @@ test: ## run the test suite
 	uv run pytest test_app/tests
 
 test-grappelli: ## run the grappelli integration tests (optional dependency)
-	uv run --with django-grappelli pytest test_app/tests/test_admin/test_grappelli.py
+	uv run --with django-grappelli python -m pytest test_app/tests/test_admin/test_grappelli.py
 
 coverage: ## check code coverage and open the report
 	uv run pytest test_app/tests --cov=flexible_reports --cov-report=term-missing --cov-report=html

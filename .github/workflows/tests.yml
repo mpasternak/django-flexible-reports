@@ -81,8 +81,14 @@ jobs:
       # has to pass without it (the grappelli tests skip themselves). Its
       # change_form.html shadows Django's, so the Clone button needs a run of
       # its own with grappelli overlaid on the synced environment.
+      #
+      # `python -m pytest`, not the `pytest` console script: with --no-sync the
+      # script's shebang resolves to the base .venv interpreter, which cannot
+      # see the grappelli added by --with, so importorskip silently skips the
+      # whole guard and the step still passes. `python -m` runs pytest under the
+      # overlay interpreter that does see it.
       - name: Run grappelli integration tests
-        run: uv run --no-sync --with django-grappelli pytest test_app/tests/test_admin/test_grappelli.py
+        run: uv run --no-sync --with django-grappelli python -m pytest test_app/tests/test_admin/test_grappelli.py -rs
 
   lint:
     runs-on: ubuntu-latest
