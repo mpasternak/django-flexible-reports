@@ -1,6 +1,6 @@
 # History
 
-## Unreleased
+## 0.4.1 (2026-07-23)
 
 * Python 3.14 is supported and tested, against both Django 5.2 LTS and 6.0.
 
@@ -8,6 +8,11 @@
   links to the documentation, repository, issue tracker and changelog rather
   than the homepage alone. `Development Status` moves from `3 - Alpha` to
   `5 - Production/Stable`.
+
+* Internal: removed the last Python 2 leftovers (`__future__` imports, UTF-8
+  encoding headers, `super(Class, self)`) and turned on ruff's `UP` (pyupgrade)
+  ruleset, which had been off, so that they cannot creep back in. No runtime
+  behaviour changed.
 
 ## 0.4.0 (2026-07-22)
 
