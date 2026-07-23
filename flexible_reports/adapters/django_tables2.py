@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 import copy
 import operator
 import sys
@@ -80,7 +79,7 @@ class StripHTMLOnExportMixin:
         self.strip_html_on_export = strip_html_on_export
 
     def value(self, **kwargs):
-        value = super(StripHTMLOnExportMixin, self).value(**kwargs)
+        value = super().value(**kwargs)
         if self.strip_html_on_export is True:
             value = lxml.html.fromstring(str(value)).text_content()
         return value

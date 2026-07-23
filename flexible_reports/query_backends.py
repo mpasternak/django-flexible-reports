@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 """Pluggable query backends for :class:`~flexible_reports.models.datasource.Datasource`.
 
 Each backend knows how to:

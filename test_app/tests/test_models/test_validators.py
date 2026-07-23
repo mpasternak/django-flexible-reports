@@ -1,5 +1,3 @@
-# -*- encoding: utf-8 -*-
-
 import pytest
 from django.core.exceptions import ValidationError
 from flexible_reports.models.validators import TemplateValidator

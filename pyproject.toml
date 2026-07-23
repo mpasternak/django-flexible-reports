@@ -119,4 +119,15 @@ target-version = "py310"
 extend-exclude = ["**/migrations/**"]
 
 [tool.ruff.lint]
-select = ["E", "F", "W"]
+# UP is ruff's pyupgrade implementation. It was off, which is how a pile of
+# Python 2 leftovers -- __future__ imports, `# -*- coding -*-` headers,
+# super(Class, self) -- survived long after the floor moved to Python 3: the
+# linter that would have flagged them was never asked to look.
+select = ["E", "F", "W", "UP"]
+
+ignore = [
+    # printf-style formatting. Not a Python 2 leftover -- `%` formatting is
+    # perfectly valid Python 3, so this is a style preference rather than
+    # cruft, and ruff classifies most of its fixes here as unsafe.
+    "UP031",
+]

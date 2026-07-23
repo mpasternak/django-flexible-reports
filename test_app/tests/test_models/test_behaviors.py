@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 from test_app.models import RealLabelled, RealTitled
 
 VAL = "foo"

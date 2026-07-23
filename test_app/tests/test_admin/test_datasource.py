@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 import pytest
 from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType

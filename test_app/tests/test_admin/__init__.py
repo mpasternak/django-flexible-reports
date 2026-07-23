@@ -1,5 +1,3 @@
-# -*- encoding: utf-8 -*-
-
 import pytest
 from django.urls.base import reverse
 from flexible_reports.models import Report, Table

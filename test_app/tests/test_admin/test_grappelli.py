@@ -1,5 +1,3 @@
-# -*- encoding: utf-8 -*-
-
 """Regression guard: the Clone button must survive grappelli.
 
 ``flexible_reports/templates/admin/flexible_reports/change_form_with_clone.html``
