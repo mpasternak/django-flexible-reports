@@ -164,12 +164,13 @@ Documentation dependencies live in `docs/requirements.txt`, not in
 Every pull request runs
 [`.github/workflows/tests.yml`](https://github.com/mpasternak/django-flexible-reports/blob/master/.github/workflows/tests.yml), which is:
 
-|                | Python 3.10 | Python 3.11 | Python 3.12 | Python 3.13 |
-|----------------|:-----------:|:-----------:|:-----------:|:-----------:|
-| Django 5.2 LTS |      ✔      |      ✔      |      ✔      |      ✔      |
-| Django 6.0     |      —      |      —      |      ✔      |      ✔      |
+|                | Python 3.10 | Python 3.11 | Python 3.12 | Python 3.13 | Python 3.14 |
+|----------------|:-----------:|:-----------:|:-----------:|:-----------:|:-----------:|
+| Django 5.2 LTS |      ✔      |      ✔      |      ✔      |      ✔      |      ✔      |
+| Django 6.0     |      —      |      —      |      ✔      |      ✔      |      ✔      |
+| Django 6.1     |      —      |      —      |      ✔      |      ✔      |      ✔      |
 
-Django 6.0 needs Python 3.12+, so those two legs are excluded. Each leg runs
+Django 6.0 and 6.1 need Python 3.12+, so those legs are excluded. Each leg runs
 the suite against a PostgreSQL service container, then the grappelli test
 separately. A `lint` job runs `ruff check` and `ruff format --check`.
 
@@ -185,9 +186,9 @@ with `--strict` on every pull request, and deploys to GitHub Pages only from
     it.
 3.  **Add a `HISTORY.md` entry** under the topmost *(unreleased)* heading,
     written for someone upgrading rather than for someone reading the diff.
-4.  **Keep the matrix green.** The change has to work on Python 3.10–3.13 with
-    Django 5.2, and on Python 3.12–3.13 with Django 6.0. If you cannot run all
-    of them locally, push the branch and let GitHub Actions tell you.
+4.  **Keep the matrix green.** The change has to work on Python 3.10–3.14 with
+    Django 5.2, and on Python 3.12–3.14 with Django 6.0 and 6.1. If you cannot
+    run all of them locally, push the branch and let GitHub Actions tell you.
 5.  **New user-facing strings go through `gettext`.** The package is
     translated (`flexible_reports/locale/`, currently Polish).
 
