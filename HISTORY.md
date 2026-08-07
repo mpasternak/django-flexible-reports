@@ -1,6 +1,6 @@
 # History
 
-## (unreleased)
+## 0.4.2 (2026-08-07)
 
 * Added support for Django 6.1. It joins 5.2 LTS and 6.0 in the tested matrix,
   on Python 3.12–3.14 (Django 6.1 requires Python 3.12+).
