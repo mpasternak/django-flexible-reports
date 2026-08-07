@@ -6,6 +6,37 @@ from django.utils.translation import gettext_lazy as _
 from .behaviors import Labelled, Orderable
 
 
+def _related_model(descriptor):
+    """Model that a related-object descriptor on a model *class* points at.
+
+    ``Column.clean()`` walks a dotted ``attr_name`` from one model class to the
+    next, so it needs the far end of each relation with no instance to hand.
+    The way this used to be obtained -- ``descriptor.get_queryset().model`` --
+    stopped working in Django 6.1, where ``get_queryset()`` grew a mandatory
+    ``instance`` keyword argument and so can no longer be called off the class.
+    The relation metadata holds the same answer and reads the same on Django
+    5.2, 6.0 and 6.1.
+
+    Returns ``None`` for anything that is not a relation to follow, in which
+    case the caller keeps the attribute itself.
+    """
+    # Reverse one-to-one: ``related`` is the OneToOneRel, and its
+    # ``related_model`` is the model declaring the field, i.e. where the
+    # accessor lands.
+    related = getattr(descriptor, "related", None)
+    if related is not None:
+        return getattr(related, "related_model", None)
+
+    # Reverse FK and many-to-many descriptors carry a ``field`` too, but it
+    # points back at the model we came from rather than at the far end; only
+    # they have ``rel``, which is what tells them apart from the forward ones.
+    if hasattr(descriptor, "rel"):
+        return None
+
+    # Forward foreign key / one-to-one.
+    return getattr(getattr(descriptor, "field", None), "related_model", None)
+
+
 class Column(Labelled, Orderable):
     parent = models.ForeignKey("flexible_reports.Table", on_delete=models.CASCADE)
 
@@ -119,8 +150,9 @@ class Column(Labelled, Orderable):
                 try:
                     current_model = getattr(current_model, attr_name)
 
-                    if hasattr(current_model, "get_queryset"):
-                        current_model = current_model.get_queryset().model
+                    related_model = _related_model(current_model)
+                    if related_model is not None:
+                        current_model = related_model
 
                 except Exception as e:
                     raise ValidationError(

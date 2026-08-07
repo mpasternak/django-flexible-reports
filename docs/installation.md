@@ -4,8 +4,8 @@
 
 |          |                                            |
 |----------|--------------------------------------------|
-| Python   | 3.10 -- 3.13                               |
-| Django   | 5.2 LTS or 6.0 (6.0 needs Python 3.12+)    |
+| Python   | 3.10 -- 3.14                               |
+| Django   | 5.2 LTS, 6.0 or 6.1 (6.x needs Python 3.12+) |
 | Database | anything Django supports                   |
 
 The following are installed automatically as dependencies:

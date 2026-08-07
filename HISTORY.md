@@ -1,5 +1,18 @@
 # History
 
+## (unreleased)
+
+* Added support for Django 6.1. It joins 5.2 LTS and 6.0 in the tested matrix,
+  on Python 3.12–3.14 (Django 6.1 requires Python 3.12+).
+
+* Fixed validation of a `Column` whose *Attribute name* walks a relation in dot
+  notation (`parent.title`) under Django 6.1. Resolving the far end of the
+  relation went through the descriptor's `get_queryset()`, which in Django 6.1
+  takes a mandatory `instance` argument and so cannot be called off the model
+  class any more; every such column was rejected as invalid. The related model
+  now comes from the relation metadata, which reads the same on 5.2, 6.0 and
+  6.1.
+
 ## 0.4.1 (2026-07-23)
 
 * Python 3.14 is supported and tested, against both Django 5.2 LTS and 6.0.

@@ -28,8 +28,9 @@ so you get sortable headers, footers/totals and export for free.
 |----------------|:-----------:|:-----------:|:-----------:|:-----------:|:-----------:|
 | Django 5.2 LTS |      ✔      |      ✔      |      ✔      |      ✔      |      ✔      |
 | Django 6.0     |      —      |      —      |      ✔      |      ✔      |      ✔      |
+| Django 6.1     |      —      |      —      |      ✔      |      ✔      |      ✔      |
 
-Django 6.0 requires Python 3.12+. Django 4.2, 5.0 and 5.1 are no longer
+Django 6.0 and 6.1 require Python 3.12+. Django 4.2, 5.0 and 5.1 are no longer
 supported or tested — the floor is Django 5.2 LTS.
 
 ## Documentation
