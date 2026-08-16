@@ -1,5 +1,15 @@
 # History
 
+## (unreleased)
+
+* Added `Report.set_order_by(*fields)`, a third render-time setter alongside
+  `set_base_queryset()` and `set_context()`. It overrides the ordering stored
+  on every table of the report for one render, and takes ORM field names
+  rather than the column labels `ColumnOrder` uses — so a report can be sorted
+  by a field that no column displays, which the stored ordering cannot
+  express. `ColumnOrder` is left untouched and keeps serving as the default;
+  calling the setter with no arguments falls back to it.
+
 ## 0.4.2 (2026-08-07)
 
 * Added support for Django 6.1. It joins 5.2 LTS and 6.0 in the tested matrix,

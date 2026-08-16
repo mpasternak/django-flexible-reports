@@ -161,16 +161,25 @@ def column(column):
     return (column.label, klass)
 
 
-def _table(table):
+def _table(table, ordering_overridden=False):
     # The class is rebuilt on every call. It used to be cached per ``Table.pk``
     # for the lifetime of the process, which made label changes and removed
     # columns invisible until a restart. The cache saved ~0.5 ms per render,
     # far less than caching the compiled column templates does.
+    #
+    # ``ordering_overridden`` means the caller already ordered the queryset via
+    # ``Report.set_order_by``. The table's own ``ColumnOrder`` must then be
+    # dropped rather than merely ignored: django-tables2 applies
+    # ``Meta.order_by`` to the data unconditionally, so leaving it in place
+    # would re-sort the rows and undo the override. With an empty ordering it
+    # skips the queryset entirely (``if accessors:`` in its ``data.py``) and
+    # the caller's ``order_by`` survives.
     order_by = []
-    for column_order in (
-        table.columnorder_set.all().select_related().order_by("position")
-    ):
-        order_by.append(column_order.get())
+    if not ordering_overridden:
+        for column_order in (
+            table.columnorder_set.all().select_related().order_by("position")
+        ):
+            order_by.append(column_order.get())
     table.order_by = order_by
 
     class AdHocTable(Table):
@@ -188,8 +197,8 @@ def _table(table):
     return AdHocTable
 
 
-def table(table, request, object_list):
-    return _table(table)(data=object_list, request=request)
+def table(table, request, object_list, ordering_overridden=False):
+    return _table(table, ordering_overridden)(data=object_list, request=request)
 
 
 def _report(report, parent_context):
@@ -221,6 +230,8 @@ def _report(report, parent_context):
         }
     )
 
+    order_by = report.order_by
+
     reportelements_set = (
         report.reportelement_set.all()
         .prefetch_related("datasource", "datasource__base_model", "table")
@@ -243,10 +254,21 @@ def _report(report, parent_context):
             if datasource.distinct:
                 object_list = object_list.distinct()
 
+            # Ordering is applied here, after the queryset has been handed to
+            # ``catchall``: those copies get OR-ed together further down, and an
+            # ORDER BY on the operands only muddies that combination.
+            if order_by:
+                object_list = object_list.order_by(*order_by)
+
             table_dict = {
                 "title": elem.title,
                 "object_list": object_list,
-                "table": table(elem.table, parent_context["request"], object_list),
+                "table": table(
+                    elem.table,
+                    parent_context["request"],
+                    object_list,
+                    ordering_overridden=bool(order_by),
+                ),
             }
 
         else:
@@ -290,8 +312,15 @@ def _report(report, parent_context):
         key = "%s_%s" % (base_model.app_label, base_model.model)
 
         object_list = render_context["except_catchall"][key]
+        if order_by:
+            object_list = object_list.order_by(*order_by)
         elem["object_list"] = object_list
-        elem["table"] = table(elem["table"], parent_context["request"], object_list)
+        elem["table"] = table(
+            elem["table"],
+            parent_context["request"],
+            object_list,
+            ordering_overridden=bool(order_by),
+        )
 
     return render_context
 

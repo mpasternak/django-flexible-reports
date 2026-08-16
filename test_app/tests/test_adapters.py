@@ -14,6 +14,7 @@ from flexible_reports.models.report import (
     DATA_FROM_DATASOURCE,
     DATA_FROM_EXCEPT_CATCHALL,
 )
+from flexible_reports.models.table import ColumnOrder
 from test_app.models import MyTestBar
 
 from ..models import MyTestFoo
@@ -455,3 +456,81 @@ def test_except_catchall_rendered_into_element_object_list(rf):
     object_list = res["elements"][ec_elem.slug]["object_list"]
     assert object_list.count() == 1
     assert object_list[0].i == 3
+
+
+def _rendered_cells(report, rf):
+    """Cell texts of the report's single table, in rendered top-to-bottom order."""
+    request = rf.get("/")
+    html = django_tables2.as_html(
+        report, RequestContext(request, dict(request=request))
+    )
+    bs = BeautifulSoup(html, "html.parser")
+    return [td.text.strip() for td in bs.table.tbody.find_all("td")]
+
+
+@pytest.mark.django_db
+def test_set_order_by_overrides_column_order(rf):
+    # The table's own ColumnOrder is the *default* ordering; a caller that
+    # knows better (a view offering the user a choice of sort) overrides it
+    # for one render without touching the stored definition.
+    r, t, columns = _build_report(["Value"], values=(3, 1, 2))
+    baker.make(ColumnOrder, table=t, column=columns[0], desc=False, position=0)
+
+    assert _rendered_cells(r, rf) == ["1", "2", "3"]
+
+    r.set_order_by("-i")
+
+    assert _rendered_cells(r, rf) == ["3", "2", "1"]
+
+
+@pytest.mark.django_db
+def test_set_order_by_orders_except_catchall_element():
+    # Except-catchall elements are built on a separate code path from
+    # datasource ones, and are just as much part of a report's output.
+    mtf = ContentType.objects.get_for_model(MyTestFoo)
+    for value in (3, 5, 4):
+        baker.make(MyTestFoo, i=value)
+
+    r = baker.make(Report, title="Report title")
+    t = baker.make(Table, label="table", base_model=mtf)
+    baker.make(Column, label="Value", parent=t, attr_name="i", position=0)
+
+    ds = baker.make(Datasource, base_model=mtf, dsl_query="i < 3")
+    baker.make(
+        ReportElement,
+        slug="caught",
+        table=t,
+        parent=r,
+        datasource=ds,
+        data_from=DATA_FROM_DATASOURCE,
+    )
+    rest = baker.make(
+        ReportElement,
+        slug="rest",
+        table=t,
+        parent=r,
+        datasource=None,
+        base_model=mtf,
+        data_from=DATA_FROM_EXCEPT_CATCHALL,
+    )
+
+    r.set_base_queryset(MyTestFoo.objects.all())
+    r.set_order_by("i")
+
+    res = django_tables2._report(r, {"request": None})
+
+    assert [o.i for o in res["elements"][rest.slug]["object_list"]] == [3, 4, 5]
+
+
+@pytest.mark.django_db
+def test_set_order_by_with_no_fields_falls_back_to_column_order(rf):
+    # Guard for the documented escape hatch: clearing the override must restore
+    # the table's stored ordering rather than leave the rows unsorted.
+    r, t, columns = _build_report(["Value"], values=(3, 1, 2))
+    baker.make(ColumnOrder, table=t, column=columns[0], desc=True, position=0)
+
+    r.set_order_by("i")
+    assert _rendered_cells(r, rf) == ["1", "2", "3"]
+
+    r.set_order_by()
+    assert _rendered_cells(r, rf) == ["3", "2", "1"]
