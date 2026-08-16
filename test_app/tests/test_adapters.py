@@ -458,9 +458,9 @@ def test_except_catchall_rendered_into_element_object_list(rf):
     assert object_list[0].i == 3
 
 
-def _rendered_cells(report, rf):
+def _rendered_cells(report, rf, **query):
     """Cell texts of the report's single table, in rendered top-to-bottom order."""
-    request = rf.get("/")
+    request = rf.get("/", data=query or None)
     html = django_tables2.as_html(
         report, RequestContext(request, dict(request=request))
     )
@@ -534,3 +534,33 @@ def test_set_order_by_with_no_fields_falls_back_to_column_order(rf):
 
     r.set_order_by()
     assert _rendered_cells(r, rf) == ["3", "2", "1"]
+
+
+@pytest.mark.django_db
+def test_column_header_link_sorts_the_table(rf):
+    # The tables render their headers as "?sort=<label>" links, and the whole
+    # Table.sort_option / group_prefix machinery exists to namespace exactly
+    # that parameter -- but nothing ever read it back, so clicking a header
+    # changed the URL and left the rows where they were.
+    r, t, columns = _build_report(["Value"], values=(3, 1, 2))
+    baker.make(ColumnOrder, table=t, column=columns[0], desc=False, position=0)
+
+    assert _rendered_cells(r, rf) == ["1", "2", "3"]
+
+    assert _rendered_cells(r, rf, sort="-Value") == ["3", "2", "1"]
+
+
+@pytest.mark.django_db
+def test_column_header_link_wins_over_set_order_by(rf):
+    # Table.__init__ runs RequestConfig when it gets a request, so a header
+    # click lands after the caller's override. That precedence is the right way
+    # round -- an explicit click is more specific than a default chosen for the
+    # user -- but it only holds because set_order_by sorts the queryset instead
+    # of filling Meta.order_by, so pin it.
+    r, t, columns = _build_report(["Value"], values=(3, 1, 2))
+    baker.make(ColumnOrder, table=t, column=columns[0], desc=False, position=0)
+
+    r.set_order_by("-i")
+    assert _rendered_cells(r, rf) == ["3", "2", "1"]
+
+    assert _rendered_cells(r, rf, sort="Value") == ["1", "2", "3"]
