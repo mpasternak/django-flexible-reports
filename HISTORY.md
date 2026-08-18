@@ -1,6 +1,6 @@
 # History
 
-## (unreleased)
+## 0.5.0 (2026-08-19)
 
 * Added `Report.set_order_by(*fields)`, a third render-time setter alongside
   `set_base_queryset()` and `set_context()`. It overrides the ordering stored
