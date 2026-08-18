@@ -34,7 +34,25 @@ def library_report(request):
     [Query languages](queries.md). Defaults to `None`, which the backends
     treat as an empty context.
 
-Both setters only touch the in-memory instance; nothing is saved.
+`set_order_by(*fields)`
+:   Optional. Overrides the ordering of every table in the report for this
+    render:
+
+    ```python
+    report.set_order_by("author__surname", "-year")
+    ```
+
+    The arguments are ORM field names, exactly as `QuerySet.order_by()` takes
+    them -- **not** the column labels that a table's stored `ColumnOrder`
+    uses. That difference is the point: a table can only be ordered by columns
+    it actually has, so `ColumnOrder` cannot sort by a field the report does
+    not display. This setter can.
+
+    Without it, each table keeps the ordering stored in its `ColumnOrder`.
+    Calling it with no arguments restores that fallback.
+
+None of the setters touch anything but the in-memory instance; nothing is
+saved.
 
 ## The template tags
 

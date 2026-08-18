@@ -136,7 +136,7 @@ being edited.
 | `slug` | How your view looks the report up. |
 | `template` | Django template source for the report's layout. Defaults to the contents of `flexible_reports/templates/flexible_reports/report.html` and is validated on save (it has to compile). |
 
-Two setters have to be called before rendering (see
+Three setters are available before rendering (see
 [Rendering reports](rendering.md)):
 
 `set_base_queryset(queryset)`
@@ -146,8 +146,16 @@ Two setters have to be called before rendering (see
 `set_context(context)`
 :   Optional. A dict used to render parametrised queries.
 
-Both store their value on the in-memory instance only; nothing is written to
-the database.
+`set_order_by(*fields)`
+:   Optional. Overrides the ordering of every table in the report for this
+    render. Takes ORM field names as `QuerySet.order_by()` does (`"-year"`,
+    `"author__surname"`), *not* the column labels
+    [`ColumnOrder`](#columnorder) uses — so you can sort by a field no column
+    displays. Without it, each table keeps its stored `ColumnOrder`; calling it
+    with no arguments restores that fallback.
+
+All three store their value on the in-memory instance only; nothing is written
+to the database.
 
 ## ReportElement
 

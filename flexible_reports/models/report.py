@@ -125,6 +125,7 @@ class Report(Titled):
 
     _base_queryset = None
     _context = None
+    _order_by = None
 
     @property
     def base_queryset(self):
@@ -139,6 +140,14 @@ class Report(Titled):
     def context(self):
         return self._context
 
+    @property
+    def order_by(self):
+        """Model field names overriding every table's own ``ColumnOrder``.
+
+        Empty unless :meth:`set_order_by` was called for this render.
+        """
+        return self._order_by
+
     class Meta:
         verbose_name_plural = _("Reports")
         verbose_name = _("Report")
@@ -148,6 +157,20 @@ class Report(Titled):
 
     def set_context(self, context):
         self._context = context
+
+    def set_order_by(self, *fields):
+        """Override the stored ordering of every table in this report.
+
+        ``fields`` are ORM field names as ``QuerySet.order_by`` takes them
+        (``"-rok"``, ``"autor__nazwisko"``), NOT the column labels that
+        ``ColumnOrder`` uses. That is the point of this hook: it can sort by a
+        field no column displays, which ``ColumnOrder`` cannot -- django-tables2
+        only orders by columns that exist on the table.
+
+        The stored ``ColumnOrder`` stays untouched and keeps serving as the
+        default; call this with no arguments to fall back to it.
+        """
+        self._order_by = fields
 
     def clone(self):
         """Copy this report together with its elements.
