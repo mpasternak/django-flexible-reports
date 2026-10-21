@@ -1,5 +1,12 @@
 # History
 
+## 0.5.1 (unreleased)
+
+* Fixed the explanatory comment above the *Clone* button leaking into the
+  admin change form of reports and tables. Django's `{# ... #}` comments are
+  single-line only, and this one spanned four lines. A test now checks that
+  every shipped template keeps its `{# #}` comments on one line.
+
 ## 0.5.0 (2026-08-19)
 
 * Added `Report.set_order_by(*fields)`, a third render-time setter alongside
