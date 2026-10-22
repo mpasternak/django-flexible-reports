@@ -1,6 +1,6 @@
 # History
 
-## 0.5.1 (unreleased)
+## 0.5.1 (2026-10-22)
 
 * Fixed the explanatory comment above the *Clone* button leaking into the
   admin change form of reports and tables. Django's `{# ... #}` comments are
