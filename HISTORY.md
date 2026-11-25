@@ -1,5 +1,39 @@
 # History
 
+## Unreleased
+
+* The query field of the datasource admin form is now an editor: syntax
+  colouring for django-dsl and DjangoQL (template tags included), a *Format*
+  button that re-indents a query without changing its meaning
+  (`flexible_reports.query_format.format_query()`), completion of DjangoQL
+  field names and values for the selected base model -- by the widget that
+  ships with djangoql, so add `"djangoql"` to `INSTALLED_APPS` to get it -- and
+  a clickable list of fields and shortcuts for django-dsl. No editor library is
+  involved and the field remains a plain `<textarea>`.
+
+* `DjangoQLQueryBackend.schema_class` / `get_schema_class()`: the DjangoQL
+  schema used to filter, to validate and to feed completion. A project schema
+  no longer requires overriding `filter_queryset()` and `validate()`.
+
+* New setting `FLEXIBLE_REPORTS_BASE_MODELS`, a list of
+  `"app_label.ModelName"`. It narrows the *Base model* list of the datasource
+  form to those models, in that order, and preselects the first one. Unset, the
+  form offers every model as before. Datasources already pointing at a model
+  outside the list keep working and stay editable.
+
+* The table form no longer asks for a *Base model*. It duplicated the model of
+  the datasource and nothing kept the two in agreement. Columns are now
+  validated against the models of the datasources the table is used with
+  (`Table.get_base_models()`), falling back to the stored value for existing
+  tables and to the first of `FLEXIBLE_REPORTS_BASE_MODELS`.
+  `Table.base_model` stays in the database but becomes nullable (migration
+  `0015`); nothing is removed.
+
+* The report element form no longer asks for a *Base model* either. An
+  "except catchall" element without one lists everything the report's
+  datasources left behind; elements that store a model behave as before.
+  `ReportElement.clean()` no longer requires the field for such elements.
+
 ## 0.5.1 (2026-10-22)
 
 * Fixed the explanatory comment above the *Clone* button leaking into the

@@ -37,7 +37,7 @@ narrows it. Whatever your view excludes can never show up in a report.
 | Field | Meaning |
 |-------|---------|
 | `label` | Name shown in the admin. |
-| `base_model` | `ContentType` of the model being queried. Used to resolve field names and query shortcuts. |
+| `base_model` | `ContentType` of the model being queried. Used to resolve field names and query shortcuts. The admin offers every model of the project unless [`FLEXIBLE_REPORTS_BASE_MODELS`](installation.md#limit-the-models-offered-as-a-base-model) narrows the list. |
 | `query_language` | `"dsl"` (django-dsl, the default) or `"djangoql"`. See [Query languages](queries.md). |
 | `dsl_query` | The query itself. Despite the field name it holds a query in whichever language `query_language` selects. |
 | `sample_context` | JSON object with example values for the query's template parameters, e.g. `{"min_pages": 300}`. Used **only** to validate the query on save. |
@@ -64,11 +64,30 @@ Methods worth knowing:
 | Field | Meaning |
 |-------|---------|
 | `label` | Name shown in the admin. |
-| `base_model` | `ContentType` the columns' `attr_name` values are validated against. |
+| `base_model` | Legacy and optional; not on the admin form. See *Which model a table belongs to* below. |
 | `sort_option` | How this table cooperates with other tables on the page -- see below. |
 | `group_prefix` | Only for *sort in group*: the shared prefix. |
 | `attrs` | JSON dict of HTML attributes for the `<table>` element, e.g. `{"class": "report-table"}`. |
 | `empty_template` | Markup shown instead of the table when there are no rows. Rendered as safe HTML. |
+
+### Which model a table belongs to
+
+A table does not choose a model of its own. `Table.get_base_models()` works it
+out from where the table is used, and that is what the columns' `attr_name`
+values are validated against:
+
+1. the models of the datasources of every report element using the table (and
+   the `base_model` of an except-catchall element that names one);
+2. failing that -- the table is not part of any report yet -- the table's own
+   stored `base_model`, which tables created before 0.6 carry;
+3. failing that, the first model of `FLEXIBLE_REPORTS_BASE_MODELS`.
+
+When none of the three yields a model, `attr_name` is accepted unchecked until
+the table is put into a report.
+
+Up to 0.5 the table form asked for a "Base model" as well, right after the
+datasource form had asked for the same thing, and nothing kept the two in
+agreement. The column is still there, so existing tables validate as before.
 
 ### Sort options
 
@@ -170,7 +189,7 @@ with.
 | `position` | Order within the report. |
 | `data_from` | `DATA_FROM_DATASOURCE` (`0`) or `DATA_FROM_EXCEPT_CATCHALL` (`2`). |
 | `datasource` | Set for `DATA_FROM_DATASOURCE`, must be empty otherwise. |
-| `base_model` | Set for `DATA_FROM_EXCEPT_CATCHALL`, must be empty otherwise. |
+| `base_model` | Optional, and only for `DATA_FROM_EXCEPT_CATCHALL`; must be empty otherwise. Not on the admin form. |
 | `table` | The table used to render the rows. |
 
 `clean()` enforces exactly those combinations.
@@ -179,7 +198,7 @@ with.
 
 An element with `data_from = DATA_FROM_EXCEPT_CATCHALL` shows **everything
 from the base queryset that none of the report's datasource-backed elements
-picked up**, for the given `base_model`. It is how you build a report that
+picked up**. It is how you build a report that
 ends with an "everything else" table without having to write the complementary
 query by hand -- and, more usefully, without having to keep that query in sync
 when someone edits the other datasources in the admin.
@@ -192,9 +211,15 @@ Behaviour to be aware of:
 * The exclusion set is built after every datasource element has been processed,
   so the `position` of the except-catchall element within the report does not
   matter.
-* If no datasource in the report targets the element's `base_model`, the
-  element renders **empty** rather than "everything" -- there is no catchall
-  entry for that model to subtract from.
+* An element with no `base_model` -- what the admin creates -- subtracts the
+  rows caught by *all* of the report's datasources. Every datasource filters
+  the same base queryset, so for a report built on one model this is the whole
+  story.
+* An element that does name a `base_model` (set from code, or saved before
+  0.6) subtracts only what the datasources of that model caught. If no
+  datasource in the report targets that model, the element renders **empty**
+  rather than "everything" -- there is no catchall entry for that model to
+  subtract from.
 
 ## Behaviours (mixins)
 

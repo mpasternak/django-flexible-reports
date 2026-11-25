@@ -27,6 +27,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.admin",
     "flexible_reports",
+    # Not needed to run reports; it is what serves the completion widget of
+    # the datasource query editor (its static files and JS catalog).
+    "djangoql",
     "django_tables2",
     "test_app",
 ]

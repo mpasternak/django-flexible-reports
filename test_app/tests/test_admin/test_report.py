@@ -19,3 +19,10 @@ def test_report(admin_client):
     baker.make(ReportElement, datasource=ds, parent=r)
 
     admin_client.get(reverse("admin:flexible_reports_report_changelist"))
+
+
+@pytest.mark.django_db
+def test_report_element_form_does_not_ask_for_a_model(admin_client):
+    res = admin_client.get(reverse("admin:flexible_reports_report_add"))
+    assert "reportelement_set" in res.rendered_content
+    assert "base_model" not in res.rendered_content

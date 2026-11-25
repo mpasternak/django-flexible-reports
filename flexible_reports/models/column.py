@@ -47,7 +47,8 @@ class Column(Labelled, Orderable):
         max_length=200,
         help_text=_(
             """
-        Attribute name on the parent table's base model.
+        Attribute name on the model of the datasource this table is used
+        with.
 
         If this column is sortable, that attribute is used to sort this
         column.
@@ -138,41 +139,45 @@ class Column(Labelled, Orderable):
         verbose_name = _("Column")
         verbose_name_plural = _("Columns")
 
+    def _clean_attr_name(self, parent_model):
+        """Check that the dotted ``attr_name`` resolves on ``parent_model``."""
+        current_model = parent_model
+
+        for attr_name in self.attr_name.split("."):
+            try:
+                current_model = getattr(current_model, attr_name)
+
+                related_model = _related_model(current_model)
+                if related_model is not None:
+                    current_model = related_model
+
+            except Exception as e:
+                raise ValidationError(
+                    {
+                        "attr_name": [
+                            ValidationError(
+                                _(
+                                    "'%(attr_name)s' is not a valid value for base "
+                                    "model '%(base_model)s' (exception: %("
+                                    "exception)s). "
+                                ),
+                                params={
+                                    "attr_name": self.attr_name,
+                                    "base_model": parent_model,
+                                    "exception": e,
+                                },
+                            )
+                        ]
+                    }
+                )
+
     def clean(self):
-        parent_model = self.parent.base_model.model_class()
-
         if self.attr_name:
-            path = self.attr_name.split(".")
-
-            current_model = parent_model
-
-            for attr_name in path:
-                try:
-                    current_model = getattr(current_model, attr_name)
-
-                    related_model = _related_model(current_model)
-                    if related_model is not None:
-                        current_model = related_model
-
-                except Exception as e:
-                    raise ValidationError(
-                        {
-                            "attr_name": [
-                                ValidationError(
-                                    _(
-                                        "'%(attr_name)s' is not a valid value for base "
-                                        "model '%(base_model)s' (exception: %("
-                                        "exception)s). "
-                                    ),
-                                    params={
-                                        "attr_name": self.attr_name,
-                                        "base_model": parent_model,
-                                        "exception": e,
-                                    },
-                                )
-                            ]
-                        }
-                    )
+            # Every model the table is rendered with has to have the
+            # attribute. With no model known yet (a table that is not part of
+            # any report) there is nothing to check against.
+            for parent_model in self.parent.get_base_models():
+                self._clean_attr_name(parent_model)
 
         if self.sortable and not self.attr_name:
             raise ValidationError(

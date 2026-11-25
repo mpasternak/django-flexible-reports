@@ -29,7 +29,9 @@ class ReportElementInline(SortableHiddenMixin, admin.StackedInline):
         "slug",
         "data_from",
         "datasource",
-        "base_model",
+        # No ``base_model``: an "except catchall" element without one lists
+        # whatever the report's datasources left behind, which is all the
+        # field could ever select. Elements that already store a model keep it.
         "table",
         "position",
     ]

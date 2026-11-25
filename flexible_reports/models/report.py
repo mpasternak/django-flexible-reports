@@ -39,7 +39,11 @@ class ReportElement(Titled, Orderable):
         verbose_name=_("Base model"),
         null=True,
         blank=True,
-        help_text=_("Fill only if 'except catchall' is selected in 'Data from' field"),
+        help_text=_(
+            "Only for 'except catchall' elements, and optional there: when "
+            "empty, the element lists everything no datasource of this report "
+            "has picked up."
+        ),
         on_delete=models.CASCADE,
     )
 
@@ -58,20 +62,6 @@ class ReportElement(Titled, Orderable):
                                 _(
                                     "In case when data is from except-catchall, "
                                     "please specify an empty datasource."
-                                )
-                            )
-                        ]
-                    }
-                )
-
-            if self.base_model is None:
-                raise ValidationError(
-                    {
-                        "base_model": [
-                            ValidationError(
-                                _(
-                                    "In case when data is from except-catchall, "
-                                    "please specify a base model."
                                 )
                             )
                         ]

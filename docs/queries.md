@@ -129,6 +129,43 @@ validation error. Alternatively, give the parameter a template default --
 `pages > {{ min_pages|default:0 }}` -- so the query stays valid with no
 context at all.
 
+## The query editor
+
+In the admin the query field of a datasource is an editor rather than a bare
+text box:
+
+* **Syntax colouring** for both languages, and for the template tags in a
+  parametrised query.
+* A **Format** button that puts every `and` / `or` operand on its own line and
+  indents nested groups. It only ever moves whitespace between tokens -- string
+  literals and template tags are copied as they are -- so the query means the
+  same before and after; `flexible_reports.query_format.format_query()` is the
+  function behind it.
+* For **DjangoQL**, completion of field names, operators and values as you
+  type, for the model selected in *Base model*; changing the model reloads the
+  suggestions. This needs `"djangoql"` in `INSTALLED_APPS`
+  ([installation](installation.md#configure-the-project)).
+* For **django-dsl**, a foldable list of the model's fields and
+  [shortcuts](#query-shortcuts-django-dsl-only) under the field; clicking a
+  name inserts it.
+
+The field stays an ordinary `<textarea>`: with JavaScript unavailable the form
+works as it always did.
+
+A project with its own DjangoQL schema exposes it to both validation and
+completion by registering a backend that names it:
+
+```python
+from flexible_reports import query_backends
+
+
+class MyDjangoQLBackend(query_backends.DjangoQLQueryBackend):
+    schema_class = MySchema
+
+
+query_backends.BACKENDS[query_backends.DJANGOQL] = MyDjangoQLBackend()
+```
+
 ## Errors you can expect
 
 All of these arrive as `django.core.exceptions.ValidationError` on the

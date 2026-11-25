@@ -90,7 +90,8 @@ msgstr "Nazwa atrybutu"
 #: flexible_reports/models/column.py:20
 msgid ""
 "\n"
-"        Attribute name on the parent table's base model.\n"
+"        Attribute name on the model of the datasource this table is used\n"
+"        with.\n"
 "\n"
 "        If this column is sortable, that attribute is used to sort this\n"
 "        column.\n"
@@ -107,7 +108,7 @@ msgid ""
 "        "
 msgstr ""
 "\n"
-"Nazwa atrybutu bazowego modelu określonego dla tabeli-rodzica. \n"
+"Nazwa atrybutu modelu źródła danych, z którym ta tabela jest używana. \n"
 "\n"
 "Jeżeli ta kolumna jest sortowalna, ten atrybut zostanie użyty, aby sortować "
 "wartości w tabeli. \n"
@@ -446,6 +447,39 @@ msgstr "Nie mogę skompilować kodu templatki (wyjątek: %(exception)s)"
 #: flexible_reports/templates/admin/flexible_reports/change_form_with_clone.html:14
 msgid "Clone"
 msgstr "Klonuj"
+
+#: flexible_reports/admin/datasource.py
+msgid "Format"
+msgstr "Formatuj"
+
+#: flexible_reports/admin/datasource.py
+msgid "Available fields"
+msgstr "Dostępne pola"
+
+#: flexible_reports/admin/datasource.py
+msgid "Shortcuts"
+msgstr "Skróty"
+
+#: flexible_reports/admin/datasource.py
+msgid "The query could not be formatted"
+msgstr "Nie udało się sformatować zapytania"
+
+#: flexible_reports/models/table.py
+msgid ""
+"Legacy, no longer needs to be set: the model is taken from the datasources "
+"this table is used with."
+msgstr ""
+"Pole historyczne, nie trzeba go ustawiać: model pochodzi ze źródeł danych, "
+"z którymi ta tabela jest używana."
+
+#: flexible_reports/models/report.py
+msgid ""
+"Only for 'except catchall' elements, and optional there: when empty, the "
+"element lists everything no datasource of this report has picked up."
+msgstr ""
+"Tylko dla składowych „wszystkie rekordy oprócz pasujących do źródeł danych "
+"raportu” i tam nieobowiązkowe: gdy puste, składowa pokazuje wszystko, czego "
+"nie wybrało żadne źródło danych tego raportu."
 
 #~ msgid ""
 #~ "\n"

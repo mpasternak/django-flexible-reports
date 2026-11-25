@@ -66,7 +66,9 @@ class TableForm(forms.ModelForm):
     class Meta:
         fields = [
             "label",
-            "base_model",
+            # No ``base_model``: the model comes from the datasources the table
+            # is used with (``Table.get_base_models``). Asking for it here as
+            # well meant choosing the same model twice.
             "sort_option",
             "group_prefix",
             "attrs",
@@ -81,9 +83,16 @@ class TableForm(forms.ModelForm):
 
 @admin.register(Table)
 class TableAdmin(CloneAdminMixin, admin.ModelAdmin):
-    list_display = ["label", "base_model", "short_sort_option", "columns"]
+    list_display = ["label", "base_models", "short_sort_option", "columns"]
     inlines = [ColumnInline, ColumnOrderInline]
     form = TableForm
+
+    def base_models(self, obj):
+        return ", ".join(
+            str(model._meta.verbose_name) for model in obj.get_base_models()
+        )
+
+    base_models.short_description = _("Base model")
 
     def columns(self, obj):
         return ", ".join([x.label for x in obj.column_set.all()])

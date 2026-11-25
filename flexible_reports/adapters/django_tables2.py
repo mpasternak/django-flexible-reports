@@ -309,9 +309,15 @@ def _report(report, parent_context):
         # ContentType.model. ContentType.name (the verbose name) differs from
         # the model name for most models, so using it here misses the lookup
         # and renders an empty table.
-        key = "%s_%s" % (base_model.app_label, base_model.model)
-
-        object_list = render_context["except_catchall"][key]
+        if base_model is None:
+            # No model named on the element: everything in the report's base
+            # queryset that no datasource has picked up. Every datasource
+            # filters that same queryset, so this is what the per-model lookup
+            # below yields whenever the report sticks to one model.
+            object_list = except_catchall
+        else:
+            key = "%s_%s" % (base_model.app_label, base_model.model)
+            object_list = render_context["except_catchall"][key]
         if order_by:
             object_list = object_list.order_by(*order_by)
         elem["object_list"] = object_list

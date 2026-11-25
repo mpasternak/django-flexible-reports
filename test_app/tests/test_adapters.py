@@ -338,6 +338,70 @@ def test_catchall_except_catchall(rf):
 
 
 @pytest.mark.django_db
+def test_except_catchall_without_base_model(rf):
+    # The element names no model: it lists whatever the datasources of the
+    # report left behind -- the same rows the element above gets by naming
+    # the (only) model.
+    for a in range(1, 6):
+        baker.make(MyTestFoo, i=a)
+
+    mtf = ContentType.objects.get_for_model(MyTestFoo)
+
+    r = baker.make(Report)
+    t = baker.make(Table, base_model=None)
+    baker.make(Column, parent=t)
+
+    for slug, query in (("low", "i > 0 AND i < 3"), ("high", "i > 3")):
+        ds = baker.make(Datasource, base_model=mtf, dsl_query=query)
+        baker.make(
+            ReportElement,
+            table=t,
+            parent=r,
+            datasource=ds,
+            data_from=DATA_FROM_DATASOURCE,
+            slug=slug,
+        )
+
+    rex = baker.make(
+        ReportElement,
+        table=t,
+        parent=r,
+        datasource=None,
+        base_model=None,
+        data_from=DATA_FROM_EXCEPT_CATCHALL,
+        slug="rest",
+    )
+    rex.clean()
+
+    r.set_base_queryset(MyTestFoo.objects.all())
+
+    res = django_tables2._report(r, {"request": None})
+    assert [x.i for x in res["elements"]["rest"]["object_list"]] == [3]
+
+
+@pytest.mark.django_db
+def test_except_catchall_without_base_model_and_without_datasources(rf):
+    for a in range(1, 4):
+        baker.make(MyTestFoo, i=a)
+    r = baker.make(Report)
+    t = baker.make(Table, base_model=None)
+    baker.make(Column, parent=t)
+    baker.make(
+        ReportElement,
+        table=t,
+        parent=r,
+        datasource=None,
+        base_model=None,
+        data_from=DATA_FROM_EXCEPT_CATCHALL,
+        slug="rest",
+    )
+    r.set_base_queryset(MyTestFoo.objects.all())
+
+    res = django_tables2._report(r, {"request": None})
+    assert res["elements"]["rest"]["object_list"].count() == 3
+
+
+@pytest.mark.django_db
 def test_sum_text_field(rf):
     for a in range(1, 6):
         baker.make(MyTestBar)

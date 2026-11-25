@@ -27,6 +27,8 @@ INSTALLED_APPS = [
     # The library under demonstration and its table renderer.
     "django_tables2",
     "flexible_reports",
+    # Serves the completion widget used by the datasource query editor.
+    "djangoql",
     # The demo's own reportable domain.
     "demoapp",
 ]
