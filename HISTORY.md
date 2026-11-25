@@ -1,6 +1,6 @@
 # History
 
-## 0.6.1 (unreleased)
+## 0.6.1 (2026-11-25)
 
 * Fixed a server error (`ValueError: 'ReportElementForm' has no field named
   'base_model'`) when saving a report in the admin after switching an "except
