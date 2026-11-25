@@ -68,7 +68,8 @@ def _template_end(query, pos):
         if end == -1:
             raise QueryFormatError("Unterminated template tag %r" % opening)
         end += 2
-        if opening == "{%" and query[pos + 2 : end - 2].strip() == "comment":
+        # ``{% comment %}`` may carry a note: ``{% comment "why" %}``.
+        if opening == "{%" and query[pos + 2 : end - 2].split()[:1] == ["comment"]:
             # The body of a comment block is not query text at all.
             stop = query.find("endcomment", end)
             stop = query.find("%}", stop) if stop != -1 else -1

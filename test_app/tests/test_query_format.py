@@ -101,6 +101,14 @@ def test_format_keeps_comment_block_verbatim():
     assert format_query(query, "dsl") == "a = 1\nAND\n" + comment + "\nb = 2"
 
 
+def test_format_keeps_comment_block_with_a_note_verbatim():
+    # ``{% comment "note" %}`` is the same block tag; an apostrophe or an
+    # unbalanced parenthesis in its body must not be read as query text.
+    comment = '{% comment "why" %}\n  don\'t (touch\n{% endcomment %}'
+    query = "a = 1 AND " + comment + " b = 2"
+    assert format_query(query, "djangoql") == "a = 1 AND\n" + comment + "\nb = 2"
+
+
 def test_logical_keywords_are_case_sensitive_per_language():
     # ``and`` is a plain field name to django-dsl, ``AND`` one to DjangoQL --
     # neither may be treated as an operator and moved to a new line.

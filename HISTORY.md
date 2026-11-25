@@ -1,6 +1,6 @@
 # History
 
-## Unreleased
+## 0.6.0 (unreleased)
 
 * The query field of the datasource admin form is now an editor: syntax
   colouring for django-dsl and DjangoQL (template tags included), a *Format*

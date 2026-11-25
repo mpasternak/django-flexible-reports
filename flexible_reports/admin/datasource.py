@@ -52,8 +52,11 @@ class DatasourceForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # A subclass is free to leave the field out of its form.
+        field = self.fields.get("base_model")
+        if field is None:
+            return
         adding = self.instance._state.adding
-        field = self.fields["base_model"]
         limit_base_model_field(
             field, keep_pks=[self.instance.base_model_id], set_initial=adding
         )
