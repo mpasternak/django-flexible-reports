@@ -32,6 +32,10 @@ __all__ = ["QueryFormatError", "format_query", "significant_tokens"]
 
 INDENT = "    "
 
+#: Parentheses nested deeper than this are refused. No hand-written query comes
+#: near it, and the layout code recurses once per level.
+MAX_DEPTH = 100
+
 #: A parenthesised group up to this many characters stays on one line.
 INLINE_GROUP_WIDTH = 60
 
@@ -157,6 +161,11 @@ def _nest(tokens):
     stack = [root]
     for kind, text in tokens:
         if kind == OPEN:
+            if len(stack) > MAX_DEPTH:
+                raise QueryFormatError(
+                    "Parentheses are nested too deeply (more than %d levels)"
+                    % MAX_DEPTH
+                )
             group = []
             stack[-1].append(group)
             stack.append(group)
@@ -252,7 +261,13 @@ def _check_djangoql_ast(before, after):
         ast_after = DjangoQLParser().parse(after)
     except DjangoQLError as e:
         raise QueryFormatError("Formatting would break the query (%s)" % e) from e
-    if ast_before != ast_after:
+    try:
+        changed = ast_before != ast_after
+    except RecursionError as e:
+        # A chain of a thousand conditions parses into a tree too deep to
+        # compare. Unverified is not good enough here: refuse.
+        raise QueryFormatError("The query is too long to format safely") from e
+    if changed:
         raise QueryFormatError("Formatting would change the meaning of the query")
 
 

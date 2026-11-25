@@ -74,14 +74,13 @@ class ReportElement(Titled, Orderable):
                     {"datasource": [ValidationError(_("Please specify a datasource."))]}
                 )
 
-            if self.base_model is not None:
-                raise ValidationError(
-                    {
-                        "base_model": [
-                            ValidationError(_("Please specify an empty base model."))
-                        ]
-                    }
-                )
+            # A datasource brings its own model, so a ``base_model`` left over
+            # from the time this element was an "except catchall" one means
+            # nothing any more. Drop it rather than reject it: the field is not
+            # on the admin form, so the user could neither see nor clear it --
+            # and an error attached to a field the form does not have makes
+            # Django raise ValueError instead of showing the form again.
+            self.base_model = None
 
     class Meta:
         unique_together = [("parent", "slug")]

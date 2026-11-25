@@ -85,6 +85,16 @@ values are validated against:
 When none of the three yields a model, `attr_name` is accepted unchecked until
 the table is put into a report.
 
+!!! note "A new table for a datasource on another model"
+
+    A table that is not in any report yet is validated against the *first*
+    model of `FLEXIBLE_REPORTS_BASE_MODELS` (step 3) -- the admin cannot know
+    which datasource it is meant for. If that datasource is on a different
+    model, attribute names that only exist there are rejected at this point.
+    Do it in this order instead: create the table without columns, attach it
+    to the report element that uses the datasource, then add the columns --
+    from then on they are validated against the datasource's model (step 1).
+
 Up to 0.5 the table form asked for a "Base model" as well, right after the
 datasource form had asked for the same thing, and nothing kept the two in
 agreement. The column is still there, so existing tables validate as before.
@@ -189,7 +199,7 @@ with.
 | `position` | Order within the report. |
 | `data_from` | `DATA_FROM_DATASOURCE` (`0`) or `DATA_FROM_EXCEPT_CATCHALL` (`2`). |
 | `datasource` | Set for `DATA_FROM_DATASOURCE`, must be empty otherwise. |
-| `base_model` | Optional, and only for `DATA_FROM_EXCEPT_CATCHALL`; must be empty otherwise. Not on the admin form. |
+| `base_model` | Optional, and only for `DATA_FROM_EXCEPT_CATCHALL`. Not on the admin form; `clean()` clears it on an element that takes its data from a datasource. |
 | `table` | The table used to render the rows. |
 
 `clean()` enforces exactly those combinations.

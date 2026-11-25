@@ -145,3 +145,33 @@ def test_format_refuses_what_it_cannot_lay_out(query):
 def test_format_unknown_language():
     with pytest.raises(QueryFormatError):
         format_query("a = 1", "sql")
+
+
+def test_format_refuses_absurdly_deep_nesting():
+    # Deep enough to exhaust the interpreter's recursion limit if it were laid
+    # out; it must be refused with a message, not crash the view.
+    query = "(" * 3000 + "a = 1" + ")" * 3000
+    with pytest.raises(QueryFormatError, match="nested too deeply"):
+        format_query(query, "dsl")
+
+
+def test_format_still_handles_reasonable_nesting():
+    query = "(" * 50 + "a = 1 and b = 2" + ")" * 50
+    formatted = format_query(query, "djangoql")
+    assert significant_tokens(formatted, "djangoql") == significant_tokens(
+        query, "djangoql"
+    )
+    assert format_query(formatted, "djangoql") == formatted
+
+
+def test_format_very_long_djangoql_chain_does_not_crash():
+    # Thousands of conditions parse into a tree too deep to compare; the
+    # outcome may be a refusal, never an unhandled RecursionError.
+    query = " and ".join("a = %d" % i for i in range(3000))
+    try:
+        formatted = format_query(query, "djangoql")
+    except QueryFormatError:
+        return
+    assert significant_tokens(formatted, "djangoql") == significant_tokens(
+        query, "djangoql"
+    )

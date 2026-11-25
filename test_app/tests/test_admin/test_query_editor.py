@@ -337,3 +337,11 @@ def test_tokenizer_trailing_dot_belongs_to_the_name():
     # "author." is what the field holds while a related field is being
     # picked from the completion list; it must not be flagged as an error.
     assert _tokenize("author.", "djangoql") == [("name", "author.")]
+
+
+@pytest.mark.django_db
+def test_format_endpoint_answers_400_for_absurd_nesting(admin_client):
+    query = "(" * 3000 + "a = 1" + ")" * 3000
+    res = admin_client.post(reverse(FORMAT_URL), {"q": query, "language": "dsl"})
+    assert res.status_code == 400
+    assert "error" in res.json()
