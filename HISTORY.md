@@ -13,6 +13,20 @@
   for a query whose parentheses are nested more than 100 levels deep, or which
   is too long to verify.
 
+* *Format* refuses a query in which a template variable is joined to other
+  text outside a string literal (`{{ q }}A(B){{ q }}`). Such a variable may be
+  assembling a string literal, in which case re-spacing the query as written
+  would change the value once it is rendered. Variables standing on their own
+  (`author = {{ obj.pk }}`), next to an operator, or inside quotes format as
+  before.
+
+* Migration `0016` makes rolling back to 0.5 possible: its reverse step gives
+  every table created without a base model one again (from the datasource it
+  is used with, else the first of `FLEXIBLE_REPORTS_BASE_MODELS`) before
+  `0015` is reversed and NOT NULL comes back. Going forward it does nothing.
+  Without it, reversing `0015` failed on PostgreSQL as soon as one such table
+  existed.
+
 * Documented how a table that is not part of any report yet has its columns
   validated, and what that means for datasources on another model.
 

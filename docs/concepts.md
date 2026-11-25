@@ -95,6 +95,12 @@ the table is put into a report.
     to the report element that uses the datasource, then add the columns --
     from then on they are validated against the datasource's model (step 1).
 
+Rolling back to 0.5 restores NOT NULL on `Table.base_model`. The reverse of
+migration `0016` therefore fills in the model of every table that has none --
+from the datasource it is used with, else from the first entry of
+`FLEXIBLE_REPORTS_BASE_MODELS` -- and stops with an explanation if neither is
+available.
+
 Up to 0.5 the table form asked for a "Base model" as well, right after the
 datasource form had asked for the same thing, and nothing kept the two in
 agreement. The column is still there, so existing tables validate as before.

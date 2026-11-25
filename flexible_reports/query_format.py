@@ -10,6 +10,12 @@ parses the query -- it only moves the whitespace *between* tokens:
   operator such as ``>=`` or a dotted name such as ``author.name`` can never be
   split or have a space pushed into it.
 
+One assumption is made about template tags: a ``{{ variable }}`` outside a
+string literal renders to a whole value. Where the query itself contradicts
+that -- the variable is joined to other text, as in ``{{ q }}A(B){{ q }}`` --
+formatting is refused, because the tokens of the query as written would no
+longer be the tokens of the query as rendered.
+
 Whitespace between tokens is insignificant in django-dsl and in DjangoQL alike,
 so the result compiles to the same filter. :func:`format_query` re-checks that
 invariant on every call (:func:`significant_tokens` must be identical before and
@@ -104,6 +110,37 @@ def _string_end(query, pos, escapes):
     raise QueryFormatError("Unterminated string literal")
 
 
+#: What may touch a ``{{ variable }}`` that sits outside a string literal,
+#: besides whitespace: an opening bracket, a comma or an operator in front of
+#: it (``rok>={{ rok }}``, ``[{{ a }},{{ b }}]``), their closing counterparts
+#: behind it.
+_BEFORE_VARIABLE = frozenset("(,=<>~![")
+_AFTER_VARIABLE = frozenset("),=<>~!]")
+
+
+def _check_variable_stands_alone(query, start, end):
+    """Refuse a ``{{ variable }}`` glued to other text outside a literal.
+
+    The formatter may only move whitespace that lies *between* tokens, and it
+    finds tokens in the unrendered query. That holds as long as a variable
+    renders to a whole value. Glued to text -- ``{{ q }}A(B){{ q }}`` with ``q``
+    rendering to a quote -- it may be building a string literal out of pieces,
+    and then the space this module would put before ``(B)`` lands *inside* the
+    value. Nothing here can tell which it is, so such a query is not formatted.
+    (Inside a quoted literal a variable is safe: the quotes are in the query.)
+    """
+    before = query[start - 1] if start > 0 else " "
+    after = query[end] if end < len(query) else " "
+    if (before.isspace() or before in _BEFORE_VARIABLE) and (
+        after.isspace() or after in _AFTER_VARIABLE
+    ):
+        return
+    raise QueryFormatError(
+        "A template variable is joined to other text (%s); such a query "
+        "cannot be formatted safely" % query[start:end]
+    )
+
+
 def _tokenize(query, language):
     """``[(kind, text)]`` with whitespace dropped.
 
@@ -133,6 +170,8 @@ def _tokenize(query, language):
             pos += 1
             continue
         end = _template_end(query, pos)
+        if end is not None and char + query[pos + 1] == "{{":
+            _check_variable_stands_alone(query, pos, end)
         if end is None and char in quotes:
             end = _string_end(query, pos, escapes)
         if end is None:

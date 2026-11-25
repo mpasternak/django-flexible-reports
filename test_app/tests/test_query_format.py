@@ -175,3 +175,47 @@ def test_format_very_long_djangoql_chain_does_not_crash():
     assert significant_tokens(formatted, "djangoql") == significant_tokens(
         query, "djangoql"
     )
+
+
+@pytest.mark.parametrize(
+    "query",
+    [
+        # ``q`` may render to a quote: the parentheses would then be part of a
+        # string value, and spacing them out would change that value.
+        "title = {{ q }}A(B){{ q }}",
+        "title = {{ q }}A (B)",
+        "title = A(B){{ q }}",
+        "title = x{{ a }}",
+        "title = {{ a }}{{ b }}",
+    ],
+)
+@pytest.mark.parametrize("language", ["dsl", "djangoql"])
+def test_format_refuses_a_variable_joined_to_text(query, language):
+    with pytest.raises(QueryFormatError, match="joined to other text"):
+        format_query(query, language)
+
+
+@pytest.mark.parametrize(
+    "query,expected",
+    [
+        ("a = {{ obj.pk }} AND b = 1", "a = {{ obj.pk }}\nAND b = 1"),
+        ("a>={{ year }} AND b = 1", "a>={{ year }}\nAND b = 1"),
+        ("a IN [{{ x }},{{ y }}] AND b = 1", "a IN [{{ x }}, {{ y }}]\nAND b = 1"),
+        ("(a = {{ x }}) AND b = 1", "(a = {{ x }})\nAND b = 1"),
+        ('a = "{{ q }}A(B){{ q }}" AND b = 1', 'a = "{{ q }}A(B){{ q }}"\nAND b = 1'),
+    ],
+)
+def test_format_accepts_variables_that_stand_alone(query, expected):
+    assert format_query(query, "dsl") == expected
+
+
+def test_rendered_query_is_unchanged_by_formatting():
+    # The property the refusal above protects: rendering the formatted query
+    # yields the same tokens as rendering the original one.
+    from django.template import Context, Template
+
+    query = 'a = {{ x }} AND (b = "{{ y }} (z)" OR c IN [{{ x }},{{ x }}])'
+    context = Context({"x": 5, "y": "p  q"}, autoescape=False)
+    before = Template(query).render(context)
+    after = Template(format_query(query, "dsl")).render(context)
+    assert significant_tokens(after, "dsl") == significant_tokens(before, "dsl")

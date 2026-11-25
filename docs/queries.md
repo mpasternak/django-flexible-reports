@@ -140,7 +140,11 @@ text box:
   indents nested groups. It only ever moves whitespace between tokens -- string
   literals and template tags are copied as they are -- so the query means the
   same before and after; `flexible_reports.query_format.format_query()` is the
-  function behind it.
+  function behind it. It assumes a `{{ variable }}` outside a string literal
+  renders to a whole value, and declines to format a query where a variable is
+  joined to other text (`{{ q }}A(B){{ q }}`), since it could be assembling a
+  string literal whose contents must not be re-spaced. Queries nested more
+  than 100 parentheses deep are declined as well.
 * For **DjangoQL**, completion of field names, operators and values as you
   type, for the model selected in *Base model*; changing the model reloads the
   suggestions. This needs `"djangoql"` in `INSTALLED_APPS`
