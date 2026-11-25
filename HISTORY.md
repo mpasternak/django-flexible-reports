@@ -1,5 +1,35 @@
 # History
 
+## 0.6.1 (unreleased)
+
+* Fixed a server error (`ValueError: 'ReportElementForm' has no field named
+  'base_model'`) when saving a report in the admin after switching an "except
+  catchall" element that stored a base model over to a datasource.
+  `ReportElement.clean()` used to reject that combination with an error on
+  `base_model` -- a field 0.6.0 took off the form. It now clears the leftover
+  model instead, which is all the user could have done about it.
+
+* The *Format* button answers with an error message instead of a server error
+  for a query whose parentheses are nested more than 100 levels deep, or which
+  is too long to verify.
+
+* *Format* refuses a query in which a template variable is joined to other
+  text outside a string literal (`{{ q }}A(B){{ q }}`). Such a variable may be
+  assembling a string literal, in which case re-spacing the query as written
+  would change the value once it is rendered. Variables standing on their own
+  (`author = {{ obj.pk }}`), next to an operator, or inside quotes format as
+  before.
+
+* Migration `0016` makes rolling back to 0.5 possible: its reverse step gives
+  every table created without a base model one again (from the datasource it
+  is used with, else the first of `FLEXIBLE_REPORTS_BASE_MODELS`) before
+  `0015` is reversed and NOT NULL comes back. Going forward it does nothing.
+  Without it, reversing `0015` failed on PostgreSQL as soon as one such table
+  existed.
+
+* Documented how a table that is not part of any report yet has its columns
+  validated, and what that means for datasources on another model.
+
 ## 0.6.0 (2026-11-25)
 
 * The query field of the datasource admin form is now an editor: syntax

@@ -145,3 +145,77 @@ def test_format_refuses_what_it_cannot_lay_out(query):
 def test_format_unknown_language():
     with pytest.raises(QueryFormatError):
         format_query("a = 1", "sql")
+
+
+def test_format_refuses_absurdly_deep_nesting():
+    # Deep enough to exhaust the interpreter's recursion limit if it were laid
+    # out; it must be refused with a message, not crash the view.
+    query = "(" * 3000 + "a = 1" + ")" * 3000
+    with pytest.raises(QueryFormatError, match="nested too deeply"):
+        format_query(query, "dsl")
+
+
+def test_format_still_handles_reasonable_nesting():
+    query = "(" * 50 + "a = 1 and b = 2" + ")" * 50
+    formatted = format_query(query, "djangoql")
+    assert significant_tokens(formatted, "djangoql") == significant_tokens(
+        query, "djangoql"
+    )
+    assert format_query(formatted, "djangoql") == formatted
+
+
+def test_format_very_long_djangoql_chain_does_not_crash():
+    # Thousands of conditions parse into a tree too deep to compare; the
+    # outcome may be a refusal, never an unhandled RecursionError.
+    query = " and ".join("a = %d" % i for i in range(3000))
+    try:
+        formatted = format_query(query, "djangoql")
+    except QueryFormatError:
+        return
+    assert significant_tokens(formatted, "djangoql") == significant_tokens(
+        query, "djangoql"
+    )
+
+
+@pytest.mark.parametrize(
+    "query",
+    [
+        # ``q`` may render to a quote: the parentheses would then be part of a
+        # string value, and spacing them out would change that value.
+        "title = {{ q }}A(B){{ q }}",
+        "title = {{ q }}A (B)",
+        "title = A(B){{ q }}",
+        "title = x{{ a }}",
+        "title = {{ a }}{{ b }}",
+    ],
+)
+@pytest.mark.parametrize("language", ["dsl", "djangoql"])
+def test_format_refuses_a_variable_joined_to_text(query, language):
+    with pytest.raises(QueryFormatError, match="joined to other text"):
+        format_query(query, language)
+
+
+@pytest.mark.parametrize(
+    "query,expected",
+    [
+        ("a = {{ obj.pk }} AND b = 1", "a = {{ obj.pk }}\nAND b = 1"),
+        ("a>={{ year }} AND b = 1", "a>={{ year }}\nAND b = 1"),
+        ("a IN [{{ x }},{{ y }}] AND b = 1", "a IN [{{ x }}, {{ y }}]\nAND b = 1"),
+        ("(a = {{ x }}) AND b = 1", "(a = {{ x }})\nAND b = 1"),
+        ('a = "{{ q }}A(B){{ q }}" AND b = 1', 'a = "{{ q }}A(B){{ q }}"\nAND b = 1'),
+    ],
+)
+def test_format_accepts_variables_that_stand_alone(query, expected):
+    assert format_query(query, "dsl") == expected
+
+
+def test_rendered_query_is_unchanged_by_formatting():
+    # The property the refusal above protects: rendering the formatted query
+    # yields the same tokens as rendering the original one.
+    from django.template import Context, Template
+
+    query = 'a = {{ x }} AND (b = "{{ y }} (z)" OR c IN [{{ x }},{{ x }}])'
+    context = Context({"x": 5, "y": "p  q"}, autoescape=False)
+    before = Template(query).render(context)
+    after = Template(format_query(query, "dsl")).render(context)
+    assert significant_tokens(after, "dsl") == significant_tokens(before, "dsl")

@@ -58,10 +58,9 @@ def test_reportelement():
     with pytest.raises(ValidationError):
         re.clean()
 
+    # A model left over from an "except catchall" past is dropped, not
+    # rejected: the admin form has no such field to show the error on.
     re.base_model = mtf
     re.datasource = ds
-    with pytest.raises(ValidationError):
-        re.clean()
-
-    re.base_model = None
     re.clean()
+    assert re.base_model is None
