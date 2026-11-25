@@ -331,3 +331,9 @@ def test_tokenizer_is_total():
     # text always adds up to the input.
     tokens = _tokenize("a = 1 # $", "dsl")
     assert ("error", "#") in tokens and ("error", "$") in tokens
+
+
+def test_tokenizer_trailing_dot_belongs_to_the_name():
+    # "author." is what the field holds while a related field is being
+    # picked from the completion list; it must not be flagged as an error.
+    assert _tokenize("author.", "djangoql") == [("name", "author.")]

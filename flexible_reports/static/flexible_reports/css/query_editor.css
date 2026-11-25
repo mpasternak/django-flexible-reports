@@ -110,6 +110,18 @@ textarea.fr-query-input::selection {
   margin-top: 6px;
 }
 
+/* Explicit box properties on both kinds of button: admin skins restyle the
+   bare <button> element (django-grappelli turns it into a 25px icon button
+   pulled left by a negative margin). */
+.fr-query-toolbar button.fr-query-format {
+  position: static;
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 6px 12px;
+  overflow: visible;
+}
+
 .fr-query-status-error {
   color: var(--error-fg, #ba2121);
 }
@@ -136,7 +148,12 @@ textarea.fr-query-input::selection {
   font-weight: 600;
 }
 
-button.fr-query-hint {
+.fr-query-hints button.fr-query-hint {
+  position: static;
+  width: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
   padding: 1px 6px;
   border: 1px solid var(--border-color, #ccc);
   border-radius: 3px;
@@ -147,7 +164,7 @@ button.fr-query-hint {
   cursor: pointer;
 }
 
-button.fr-query-hint:hover {
+.fr-query-hints button.fr-query-hint:hover {
   background: var(--selected-row, #ffc);
 }
 

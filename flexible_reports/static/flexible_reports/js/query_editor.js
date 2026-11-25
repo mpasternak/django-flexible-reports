@@ -49,7 +49,9 @@
       ["operator", /^(=|>|<|~)/],
       ["paren", /^[()]/],
       ["comma", /^,/],
-      ["name", /^[_A-Za-z][_0-9A-Za-z]*(\.[_A-Za-z][_0-9A-Za-z]*)*/],
+      // The optional trailing dot is the moment between typing "author."
+      // and picking a field: not worth an error squiggle.
+      ["name", /^[_A-Za-z][_0-9A-Za-z]*(\.[_A-Za-z][_0-9A-Za-z]*)*\.?/],
     ],
     dsl: [
       ["string", /^"[^"]*"/],
@@ -258,7 +260,10 @@
 
     var toolbar = el("div", "fr-query-toolbar");
     var formatButton = el(
-      "button", "button fr-query-format", textarea.dataset.labelFormat || "Format"
+      "button",
+      // "button" is the Django admin's button class, "grp-button" grappelli's.
+      "button grp-button fr-query-format",
+      textarea.dataset.labelFormat || "Format"
     );
     formatButton.type = "button";
     var status = el("span", "fr-query-status");
