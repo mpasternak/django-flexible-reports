@@ -1,0 +1,174 @@
+/*
+ * Query editor of the datasource admin form (see js/query_editor.js).
+ *
+ * The colours are defaults only: every one of them is a custom property, so a
+ * project recolours the editor by redefining the --fr-query-* variables.
+ */
+
+.fr-query-editor {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: top;
+  --fr-query-name: #1f6feb;
+  --fr-query-operator: #cf222e;
+  --fr-query-logical: #8250df;
+  --fr-query-string: #0a7d33;
+  --fr-query-number: #953800;
+  --fr-query-constant: #953800;
+  --fr-query-punctuation: #57606a;
+  --fr-query-template-bg: rgba(130, 80, 223, 0.14);
+  --fr-query-error: #cf222e;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .fr-query-editor {
+    --fr-query-name: #79c0ff;
+    --fr-query-operator: #ff7b72;
+    --fr-query-logical: #d2a8ff;
+    --fr-query-string: #7ee787;
+    --fr-query-number: #ffa657;
+    --fr-query-constant: #ffa657;
+    --fr-query-punctuation: #8b949e;
+    --fr-query-template-bg: rgba(210, 168, 255, 0.2);
+    --fr-query-error: #ff7b72;
+  }
+}
+
+html[data-theme="dark"] .fr-query-editor {
+  --fr-query-name: #79c0ff;
+  --fr-query-operator: #ff7b72;
+  --fr-query-logical: #d2a8ff;
+  --fr-query-string: #7ee787;
+  --fr-query-number: #ffa657;
+  --fr-query-constant: #ffa657;
+  --fr-query-punctuation: #8b949e;
+  --fr-query-template-bg: rgba(210, 168, 255, 0.2);
+  --fr-query-error: #ff7b72;
+}
+
+/* The coloured copy of the text, right behind the (transparent) textarea. */
+.fr-query-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  margin: 0;
+  overflow: hidden;
+  pointer-events: none;
+  border-style: solid;
+  border-color: transparent;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+
+.fr-query-code {
+  white-space: inherit;
+  overflow-wrap: inherit;
+}
+
+/* Doubled class: has to win over the admin's own textarea rules. */
+textarea.fr-query-input.fr-query-input {
+  position: relative;
+  display: block;
+  margin: 0;
+  background: transparent;
+  color: transparent;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono",
+    monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: normal;
+  tab-size: 4;
+}
+
+textarea.fr-query-input::selection {
+  /* The text is transparent, so only the selection background shows. */
+  background: rgba(31, 111, 235, 0.25);
+}
+
+.fr-tok-name { color: var(--fr-query-name); }
+.fr-tok-operator { color: var(--fr-query-operator); }
+/* No bold here: in a proportional fallback font bold glyphs are wider, and the
+   caret would drift away from the text it belongs to. */
+.fr-tok-logical { color: var(--fr-query-logical); }
+.fr-tok-string { color: var(--fr-query-string); }
+.fr-tok-number { color: var(--fr-query-number); }
+.fr-tok-constant { color: var(--fr-query-constant); }
+.fr-tok-paren,
+.fr-tok-comma { color: var(--fr-query-punctuation); }
+.fr-tok-template { background: var(--fr-query-template-bg); border-radius: 2px; }
+.fr-tok-error { text-decoration: underline wavy var(--fr-query-error); }
+
+.fr-query-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+/* Explicit box properties on both kinds of button: admin skins restyle the
+   bare <button> element (django-grappelli turns it into a 25px icon button
+   pulled left by a negative margin). */
+.fr-query-toolbar button.fr-query-format {
+  position: static;
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 6px 12px;
+  overflow: visible;
+}
+
+.fr-query-status-error {
+  color: var(--error-fg, #ba2121);
+}
+
+.fr-query-hints {
+  margin-top: 6px;
+  max-width: 60em;
+}
+
+.fr-query-hints summary {
+  cursor: pointer;
+}
+
+.fr-query-hints-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.fr-query-hints-title {
+  flex-basis: 100%;
+  margin-top: 6px;
+  font-weight: 600;
+}
+
+.fr-query-hints button.fr-query-hint {
+  position: static;
+  width: auto;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  padding: 1px 6px;
+  border: 1px solid var(--border-color, #ccc);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--body-fg, #333);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.fr-query-hints button.fr-query-hint:hover {
+  background: var(--selected-row, #ffc);
+}
+
+/* The completion popup is appended to <body>; keep it above admin chrome. */
+.djangoql-completion {
+  z-index: 1000;
+}

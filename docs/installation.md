@@ -54,6 +54,28 @@ INSTALLED_APPS = [
 `"flexible_reports.apps.FlexibleReportsConfig"` also works; it is the same
 app config Django picks up by default.
 
+Optionally add `"djangoql"` as well. It is not needed to run reports -- the
+package is a dependency either way -- but Django only serves an app's static
+files when the app is installed, and the datasource form uses djangoql's
+completion widget to suggest field names and values while a DjangoQL query is
+typed (see [the query editor](queries.md#the-query-editor)). Without it the
+editor still colours and formats queries; it just does not complete them.
+
+### Limit the models offered as a base model
+
+A datasource's *Base model* is a foreign key to `ContentType`, so by default
+the admin lists every model of the project. Name the ones that make sense as
+report sources and the list shrinks to those, in that order, with the first
+one preselected on the "add datasource" form:
+
+```python
+FLEXIBLE_REPORTS_BASE_MODELS = ["library.Book", "library.Author"]
+```
+
+This only filters the admin form. A datasource that already points at a model
+outside the list keeps working, keeps showing that model on its change form
+and can be saved again. Leave the setting out to keep the full list.
+
 Enable the `request` context processor. `{% flexible %}` hands the
 surrounding template context to the django-tables2 adapter, which needs
 `request` in it:

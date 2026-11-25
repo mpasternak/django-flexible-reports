@@ -99,6 +99,19 @@ class DjangoQLQueryBackend:
 
     name = DJANGOQL
 
+    #: DjangoQL schema class used to filter, to validate and to feed the
+    #: completion widget of the admin query editor. ``None`` means djangoql's
+    #: default ``DjangoQLSchema``. Override it (or :meth:`get_schema_class`) in
+    #: a subclass registered in ``BACKENDS`` to expose a project schema.
+    schema_class = None
+
+    def get_schema_class(self):
+        if self.schema_class is not None:
+            return self.schema_class
+        from djangoql.schema import DjangoQLSchema
+
+        return DjangoQLSchema
+
     def _render(self, query, context):
         # autoescape=False: parameter values feed a query language, not HTML.
         # Escaping would turn query-significant characters (``<``, ``&``, ``"``)
@@ -114,7 +127,11 @@ class DjangoQLQueryBackend:
     def filter_queryset(self, base_queryset, query, context=None):
         from djangoql.queryset import apply_search
 
-        return apply_search(base_queryset, self._render(query, context))
+        return apply_search(
+            base_queryset,
+            self._render(query, context),
+            schema=self.get_schema_class(),
+        )
 
     def validate(self, query, model, context=None):
         """Validate ``query`` against ``model``.
@@ -130,7 +147,9 @@ class DjangoQLQueryBackend:
         _check_not_empty(query)
         rendered = self._render(query, context)
         try:
-            apply_search(model.objects.all(), rendered).first()
+            apply_search(
+                model.objects.all(), rendered, schema=self.get_schema_class()
+            ).first()
         except DjangoQLError as e:
             raise ValidationError(
                 {

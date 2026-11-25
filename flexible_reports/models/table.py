@@ -84,8 +84,21 @@ class ColumnOrder(Orderable):
 class Table(Labelled):
     """Collection of Columns."""
 
+    # Legacy. A table used to carry its own copy of the model, next to the one
+    # on the datasource it is rendered with, and nothing kept the two in step.
+    # The model now comes from the datasources (see ``get_base_models``); the
+    # column stays so that tables saved before that keep validating exactly as
+    # they did, and is no longer on the admin form.
     base_model = models.ForeignKey(
-        ContentType, verbose_name=_("Base model"), on_delete=models.CASCADE
+        ContentType,
+        verbose_name=_("Base model"),
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        help_text=_(
+            "Legacy, no longer needs to be set: the model is taken from the "
+            "datasources this table is used with."
+        ),
     )
 
     sort_option = models.IntegerField(
@@ -143,6 +156,47 @@ class Table(Labelled):
                         ]
                     }
                 )
+
+    def get_base_models(self):
+        """Model classes whose rows this table renders.
+
+        Taken from the report elements using the table -- the model of each
+        element's datasource, or the element's own ``base_model`` for an
+        "except catchall" element that names one. A table not used anywhere yet
+        falls back to its stored ``base_model`` (set on tables created before
+        the field left the form) and then to the first model of
+        ``settings.FLEXIBLE_REPORTS_BASE_MODELS``. An empty list means the
+        model is not known yet.
+        """
+        from ..base_models import get_default_content_type
+        from .report import ReportElement
+
+        content_types = {}
+        if self.pk is not None:
+            elements = ReportElement.objects.filter(table=self).select_related(
+                "datasource__base_model", "base_model"
+            )
+            for element in elements:
+                if element.datasource_id is not None:
+                    content_type = element.datasource.base_model
+                else:
+                    content_type = element.base_model
+                if content_type is not None:
+                    content_types[content_type.pk] = content_type
+
+        if not content_types and self.base_model_id is not None:
+            content_types[self.base_model_id] = self.base_model
+        if not content_types:
+            default = get_default_content_type()
+            if default is not None:
+                content_types[default.pk] = default
+
+        models = [ct.model_class() for ct in content_types.values()]
+        # ``model_class()`` is None for a content type whose model is gone.
+        return sorted(
+            (model for model in models if model is not None),
+            key=lambda model: model._meta.label,
+        )
 
     def get_prefix(self):
         return AllSortOptions[self.sort_option].get_prefix(None, self)
